@@ -31,7 +31,11 @@ function main() {
     process.stdin.resume();
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', function (text) {
-        rep(text);
+        try {
+            rep(text);
+        } catch(e) {
+            console.log('try again');
+        }
         if (text === 'quit\r\n') {
             done();
         }
