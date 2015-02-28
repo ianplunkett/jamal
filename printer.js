@@ -9,6 +9,9 @@ function Printer(malData) {
 Printer.prototype.build_str = function(dataString) {
 
     let output = '';
+    if (!Array.isArray(dataString) ) {
+        return dataString;
+    } 
     for (let i = 0; i < dataString.length; i++) {
         // If the current token is an array, recursively call this
         // function to build string. Otherwise, concat tokens with a space

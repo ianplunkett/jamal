@@ -4,7 +4,7 @@ var ReplException = require('./repl_exception.js');
 function Reader(tokens) {
     this.tokens = tokens;
     this.position = 0;
-    return this.read_str();
+    return this;
 };
 
 //next returns the token at the current position and increments the position.
@@ -24,9 +24,6 @@ Reader.prototype.peek = function() {
 
 Reader.prototype.read_str = function() {
     let programData = this.read_form();
-    if(!Array.isArray(programData)) {
-        programData = [programData];
-    }
     return programData;
 };
 
@@ -46,20 +43,18 @@ Reader.prototype.read_form = function() {
 Reader.prototype.read_list = function() {
     var list = [];
     var token = this.next();
-    list.push("(");
     while (token !== ')') {
         if (token !== '(') {
             list.push(token);
         }
         token = this.read_form();
     }
-    list.push(token);
     return list;
 };
 
 Reader.prototype.read_atom = function() {
     var atom  = this.next();
-    var regexp = /\d+/;
+    var regexp = /^\d+$/;
     if (regexp.test(atom)) {
         return parseInt(atom);
     } else {
