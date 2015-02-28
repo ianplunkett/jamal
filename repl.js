@@ -8,21 +8,13 @@ var Tokenizer = require('./tokenizer.js');
 /**
  * REPL
  */
-function READ(text) {
-    let tokens = new Tokenizer(text).tokenize();
-    return new Reader(tokens);
-}
+function READ(text) { return new Reader(new Tokenizer(text).tokenize()); }
 
 function EVAL(eval_r) { return eval_r; }
 
-function PRINT(malData) {
-    console.log(malData);
-    return new Printer(malData).pr_str();
-}
+function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(text) {
-    PRINT(EVAL(READ(text)));
-}
+function rep(text) { PRINT(EVAL(READ(text)));}
 /**
  * END REPL
  */

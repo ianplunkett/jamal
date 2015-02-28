@@ -27,11 +27,9 @@ Reader.prototype.read_str = function() {
 };
 
 Reader.prototype.read_form = function() {
-    console.log('in form reader');
     var token = this.next();
     let malData = [];
     token = this.peek();
-    console.log(token);
 
     if (token === '(') {
         malData = this.read_list();
@@ -44,7 +42,6 @@ Reader.prototype.read_form = function() {
 Reader.prototype.read_list = function() {
     var list = [];
     var token = this.next();
-    console.log('in list reader');
     list.push("(");
     while (token !== ')') {
         if (token !== '(') {
