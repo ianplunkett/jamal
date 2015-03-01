@@ -22,53 +22,39 @@ function Eval(ast) {
 }
 
 Eval.prototype.run = function(ast) {
-    console.log(ast);
 
-    if(ast.length === 0){
-        console.log('zero length');
-        return false;
-    }
     if(Array.isArray(ast)) {
-        let newEvalList = this.eval_ast(ast);
-        let operation = newEvalList.shift();
-        let first = newEvalList.shift();
-        let rest = newEvalList;
-        return operation(first, this.run(rest));
+        let eval_list = this.eval_ast(ast);
+        let op_code = eval_list.shift();
+        let first = eval_list.shift();
+        let left = this.eval_ast(first);
+        let right = this.eval_ast(eval_list);
+        return op_code(left, right[0]);
     } else {
         return this.eval_ast(ast);
     }
 };
 
 Eval.prototype.eval_ast = function(ast) {
-    let initialValue = '';
-    let self = this;
 
-    if (typeof typeof ast === 'number') {
-        return ast;
+    let self = this;
+    if (
+        typeof ast !== 'number'
+            && typeof self.repl_env[ast] !== 'undefined'
+            && !Array.isArray(ast))
+    {
+        return self.repl_env[ast];
+    } else if (
+        typeof ast !== 'number'
+            && typeof self.repl_env[ast] === 'undefined'
+            && !Array.isArray(ast))
+    {
+        throw new ReplException('Symbol not found in environment: '+ast);
     } else if (Array.isArray(ast)) {
-        return ast.map( c => self.eval_ast(c) );
-    } else if (typeof this.repl_env[ast] === 'undefined')  {
-        console.log('Symbol not found in environment: '+ast);
-        return false;
+        return ast.map( c => self.run(c) );
     } else {
-        var operation = Object.keys(self.repl_env).reduce(
-            function(previousValue, currentValue,index, array) {
-                if(previousValue) {
-                    currentValue = previousValue;
-                    return currentValue;
-                } else if(typeof self.repl_env[array[index]] !== 'undefined') {
-                    currentValue = self.repl_env[array[index]];
-                    return currentValue;
-                } else {
-                    currentValue = false;
-                    return currentValue;
-                }
-            },
-            initialValue
-        );
-        return operation;
+        return ast;
     }
 };
-
 
 module.exports = Eval;
