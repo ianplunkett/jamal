@@ -1,29 +1,20 @@
 'use strict';
+var Env = require('./env.js');
 var Eval = require('./eval.js');
-var ReplException = require('./repl_exception.js');
 var Reader = require('./reader.js');
 var Printer = require('./printer.js');
 var Tokenizer = require('./tokenizer.js');
-var util = require('util');
-
 
 /**
  * REPL
  */
 function READ(text) { return new Reader(new Tokenizer(text).tokenize()).read_str(); }
 
-function EVAL(ast) {
-    //    console.log(ast.position);
-    var ast_list =  new Eval().run(ast);
-    return ast_list;
-}
+function EVAL(ast) { return new Eval(new Env()).run(ast); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(text) { return PRINT(EVAL(READ(text)));
-
-
-}
+function rep(text) { return PRINT(EVAL(READ(text)));}
 /**
  * END REPL
  */

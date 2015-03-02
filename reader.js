@@ -1,5 +1,5 @@
 'use strict';
-var ReplException = require('./repl_exception.js');
+var Exception = require('./exception.js');
 
 function Reader(tokens) {
     this.tokens = tokens;
@@ -10,7 +10,7 @@ function Reader(tokens) {
 //next returns the token at the current position and increments the position.
 Reader.prototype.next = function() {
     if (this.position > this.tokens.length) {
-        throw new ReplException('EOF Error - Invalid Syntax');
+        throw new Exception('EOF Error - Invalid Syntax');
     }
     var token = this.tokens[this.position];
     this.position++;
