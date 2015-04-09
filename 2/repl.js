@@ -7,7 +7,7 @@ let Tokenizer = require('./Tokenizer.js');
 
 function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }
 
-function EVAL(ast) { return new Eval(new Env(), ast); }
+function EVAL(ast) { return new Eval(new Env(), ast).eval_ast(); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 

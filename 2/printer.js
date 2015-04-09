@@ -10,7 +10,6 @@ Printer.prototype.build_str = function(dataString) {
 
     let output = '';
     if (!Array.isArray(dataString) ) {
-        console.log('not an array?');
         return dataString;
     } 
     output = output.concat('(');

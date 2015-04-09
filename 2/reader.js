@@ -38,7 +38,6 @@ Reader.prototype.read_form = function() {
     } else {
         malData = this.read_atom();
     }
-    console.log(malData);
     return malData;
 };
 
