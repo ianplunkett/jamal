@@ -31,14 +31,14 @@ function main() {
     process.stdin.resume();
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', function (text) {
+        if (text === 'quit\r\n') {
+            done();
+        }
         try {
             rep(text);
         } catch(e) {
             console.log(e);
             console.log('try again');
-        }
-        if (text === 'quit\r\n') {
-            done();
         }
     });
 

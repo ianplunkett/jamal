@@ -23,6 +23,7 @@ Env.prototype.find = function(key) {
 };
 
 Env.prototype.get = function(key) {
+    console.log(this);
     let value  = this.find(key);
     if (typeof value === 'undefined') {
         throw new Exception('Key not found');

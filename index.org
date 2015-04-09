@@ -1,0 +1,9 @@
+* Progress Notes:
+** On a plane <2015-03-12 Thu>
+   We are having a bit of trouble with the environment and def!. Able
+   to sucessfully set a key value pair, but the state
+   disappears. Definitely have a problem with the context. Need to
+   investigate more. I think the next step is setting up a functional
+   test harness to ensure we aren't breaking things, then we can go
+   back and do some refactoring to get the environment issues squared
+   away.

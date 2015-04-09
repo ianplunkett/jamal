@@ -17,22 +17,26 @@ function Eval(env) {
     return this;
 }
 
-Eval.prototype.load_env = function(ast) {
+Eval.prototype.load_env = function() {
+    var self = this;
     this.env.set('+', (a,b) => a+b);
     this.env.set('-', (a,b) => a-b);
     this.env.set('*', (a,b) => a*b);
     this.env.set('/', (a,b) => parseInt(a/b));
-    this.env.set('def!', (a, b) => this.env.set(a, b));
+    this.env.set('def!', (a,b) => self.env.set(a, b));
     return this;
 };
 
 Eval.prototype.ast_type = function(ast) {
-    let special = ['def!', 'let', 'let*'];
+    let special = {
+        'def!': true,
+        'let*': true
+    };
     if (Array.isArray(ast)) {
         return 'list';
     } else if (typeof ast === 'number') {
         return 'number';
-    } else if (special.find(a => a === ast)) {
+    } else if (special[ast] === true) {
         return 'special';
     } else {
         return 'symbol';
@@ -44,14 +48,13 @@ Eval.prototype.run = function(ast) {
     let op_code,
         op_code_symbol ='',
         head,
+        next,
         rest,
         list;
     
     switch (this.ast_type(ast)) {
     case 'list':
-        console.log('list object');
         op_code_symbol = ast[0];
-        console.log("op code type: "+this.ast_type(op_code_symbol));
         if (this.ast_type(op_code_symbol) !== 'special' ) {
             list = this.eval_ast(ast);
             op_code_symbol = ast.shift();
@@ -66,9 +69,13 @@ Eval.prototype.run = function(ast) {
             rest = this.run(list);
             return op_code(head, rest);
         } else {
-            console.log('special op code');
-            head = list.shift();
-            return op_code(head, this.eval_ast(list));
+            op_code_symbol = ast.shift();
+            op_code = this.eval_ast(op_code_symbol);
+            head = ast.shift();
+            next = ast.shift();
+            this.env = op_code(head, next);
+            console.log(this.env);
+            return this.env[head];
         }
     default:
         return this.eval_ast(ast);        
@@ -79,7 +86,7 @@ Eval.prototype.eval_ast = function(ast) {
     let astType = this.ast_type(ast);
     let self = this,
         operation;
-    switch (this.ast_type(ast)) {
+    switch (astType) {
     case 'special':
         operation = self.env.get(ast);
         return operation;

@@ -1,10 +1,18 @@
 'use strict';
-var Exception = require('./exception.js');
+let Exception = require('./exception.js');
 
 function Reader(tokens) {
     this.tokens = tokens;
     this.position = 0;
     return this;
+}
+
+Reader.prototype.read_str = function() {
+    let programData = this.read_form();
+    if(this.tokens.length !== this.position) {
+        throw new Exception('EOF Error - Invalid Syntax');
+    }
+    return programData;
 };
 
 //next returns the token at the current position and increments the position.
@@ -22,27 +30,22 @@ Reader.prototype.peek = function() {
     return this.tokens[this.position];
 };
 
-Reader.prototype.read_str = function() {
-    let programData = this.read_form();
-    return programData;
-};
-
 Reader.prototype.read_form = function() {
-    var token = this.next();
-    let malData = [];
-    token = this.peek();
-
+    let token = this.peek(),
+        malData = [];
     if (token === '(') {
         malData = this.read_list();
     } else {
         malData = this.read_atom();
     }
+    console.log(malData);
     return malData;
 };
 
 Reader.prototype.read_list = function() {
-    var list = [];
-    var token = this.next();
+    let list = [],
+        token = this.next();
+
     while (token !== ')') {
         if (token !== '(') {
             list.push(token);
@@ -53,14 +56,13 @@ Reader.prototype.read_list = function() {
 };
 
 Reader.prototype.read_atom = function() {
-    var atom  = this.next();
-    var regexp = /^\d+$/;
+    let atom  = this.next();
+    let regexp = /^\d+$/;
     if (regexp.test(atom)) {
         return parseInt(atom);
     } else {
         return atom;
     }
 };
-
 
 module.exports = Reader;
