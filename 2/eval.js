@@ -13,11 +13,11 @@ Eval.prototype.eval_ast = function() {
     case 'list':
         return this.process_list();
     case 'special':
-        return this.process_special();
+        return this.env[this.ast];
     case 'arithmetic':
-        return this.process_arithmetic();
+        return this.env[this.ast];
     default:
-        return this.process_symbol();
+        return this.ast;
     }
 };
 
@@ -35,7 +35,6 @@ Eval.prototype.process_list = function() {
             throw new Exception('improper special form invocation:' + evaled_first.value);
         }
         return evaled_first.value(a, new Eval(this.env, b).eval_ast());
-//    case typeof first === 'object' && first.type === 'arithmetic':
     } else if(typeof evaled_first === 'object' && evaled_first.type === 'arithmetic') {
         a = new Eval(this.env, this.ast.shift());
         if (this.ast.length === 1) {
@@ -46,20 +45,9 @@ Eval.prototype.process_list = function() {
             let evaled_b = new Eval(this.env, b).eval_ast();
             return evaled_first.value(a.ast, evaled_b);
         }
-        return "I don't know how to process this type of list";
+    } else {
+        throw new Exception("I don't know how to process this type of list");
     }
-};
-
-Eval.prototype.process_symbol = function() {
-    return this.ast;
-};
-
-Eval.prototype.process_special = function() {
-    return this.env[this.ast];
-};
-
-Eval.prototype.process_arithmetic = function() {
-    return this.env[this.ast];
 };
 
 Eval.prototype.ast_type = function() {
