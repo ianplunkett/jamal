@@ -22,38 +22,39 @@ Eval.prototype.eval_ast = function() {
 };
 
 Eval.prototype.process_special = function(evaled_first) {
-    let a = this.ast.shift(),
-        b = this.ast.shift();
+    let first = this.ast.shift(),
+        rest = this.ast.shift();
     if (this.ast.length > 0) {
         throw new Exception('improper special form invocation:' + evaled_first.value);
     }
-    return evaled_first.value(a, new Eval(this.env, b).eval_ast());
+    return evaled_first.value(first, new Eval(this.env, rest).eval_ast());
 };
 
-Eval.prototype.process_arithmetic = function(evaled_first, first) {
+Eval.prototype.process_arithmetic = function(symbol, symbol_value) {
     
-    let a = new Eval(this.env, this.ast.shift()),
-        b;
-    if (this.ast.length === 1) {
-        return evaled_first.value(a.ast, new Eval(this.env, this.ast.shift()).eval_ast());
+    let first = new Eval(this.env, this.ast.shift()).eval_ast();
+    let next =  new Eval(this.env, this.ast.shift()).eval_ast();
+    let result = symbol_value.value(first, next);
+    
+    if (this.ast.length === 0) {
+        return result;
     } else {
-        b = this.ast;
-        b.unshift(first);
-        let evaled_b = new Eval(this.env, b).eval_ast();
-        return evaled_first.value(a.ast, evaled_b);
+        let new_list = [symbol,result].concat(this.ast);
+        let rest_value = new Eval(this.env, new_list).eval_ast();
+        return rest_value;
     }
 
 };
 
 Eval.prototype.process_list = function() {
 
-    let first = this.ast.shift(),
-        evaled_first = new Eval(this.env, first).eval_ast();
+    let symbol = this.ast.shift(),
+        symbol_value = new Eval(this.env, symbol).eval_ast();
 
-    if(typeof evaled_first === 'object' && evaled_first.type === 'special'){
-        return this.process_special(evaled_first);
-    } else if(typeof evaled_first === 'object' && evaled_first.type === 'arithmetic') {
-        return this.process_arithmetic(evaled_first, first);
+    if(typeof symbol_value === 'object' && symbol_value.type === 'special'){
+        return this.process_special(symbol_value);
+    } else if(typeof symbol_value === 'object' && symbol_value.type === 'arithmetic') {
+        return this.process_arithmetic(symbol, symbol_value);
     } else {
         throw new Exception("I don't know how to process this type of list");
     }
