@@ -13,9 +13,9 @@ Eval.prototype.eval_ast = function() {
     case 'list':
         return this.process_list();
     case 'special':
-        return this.env[this.ast];
+        return this.env.data[this.ast];
     case 'arithmetic':
-        return this.env[this.ast];
+        return this.env.data[this.ast];
     default:
         return this.ast;
     }
@@ -66,8 +66,8 @@ Eval.prototype.ast_type = function() {
         return 'list';
     } else if (typeof this.ast === 'number') {
         return 'number';
-    } else if (typeof this.env[this.ast] === 'object') {
-        return this.env[this.ast].type;
+    } else if (typeof this.env.data[this.ast] === 'object') {
+        return this.env.data[this.ast].type;
     } else {
         return 'symbol';
     }

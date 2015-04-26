@@ -1,5 +1,8 @@
-function Env() {
-    return {
+function Env(outer = {}) {
+
+    this.outer = outer;
+
+    this.data =  {
         '+': {
             type: 'arithmetic',
             value: (a,b) => a+b
@@ -25,6 +28,14 @@ function Env() {
             value: (a,b) => false
         }
     };
+    return this;
 }
+
+Env.prototype.set = function() {};
+
+Env.prototype.find = function() {};
+
+Env.prototype.get = function() {};
+
 
 module.exports = Env;
