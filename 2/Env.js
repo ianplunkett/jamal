@@ -1,41 +1,27 @@
-function Env(outer = {}) {
-
+function Env(outer) {
     this.outer = outer;
-
-    this.data =  {
-        '+': {
-            type: 'arithmetic',
-            value: (a,b) => a+b
-        },
-        '-': {
-            type: 'arithmetic',
-            value: (a,b) => a-b
-        },
-        '*': {
-            type: 'arithmetic',
-            value: (a,b) => a*b
-        },
-        '/': {
-            type: 'arithmetic',
-            value: (a,b) => parseInt(a/b)
-        },
-        'def!': {
-            type: 'special',
-            value: (a,b) => 'define a new symbol'
-        },
-        'let*': {
-            type: 'special',
-            value: (a,b) => false
-        }
-    };
+    this.data = {};
     return this;
 }
 
-Env.prototype.set = function() {};
+Env.prototype.set = function(key, value) {
+    this.data[key] = value;
+    return this;
+};
 
-Env.prototype.find = function() {};
+Env.prototype.find = function(key) {
+    if (this.data[key]) {
+        return this.data[key];
+    } else if (typeof this.outer === 'object') {
+        return this.outer.find(key);
+    } else {
+        return 'symbol not found';
+    }
+};
 
-Env.prototype.get = function() {};
+Env.prototype.get = function(key) {
+    return this.find(key);
+};
 
 
 module.exports = Env;
