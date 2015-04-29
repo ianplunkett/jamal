@@ -48,7 +48,7 @@ Eval.prototype.process_let = function() {
             env.set(bindings[i], data);
         }
     }
-    return env.get(this.ast.shift()).value;
+    return new Eval(env, this.ast.shift()).eval_ast();
 };
 
 Eval.prototype.process_def = function() {
