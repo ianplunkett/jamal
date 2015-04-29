@@ -34,8 +34,9 @@ Eval.prototype.process_special = function(symbol) {
 };
 
 Eval.prototype.process_let = function() {
-    let env = new Env(this.env);
-    let bindings = this.ast.shift();
+    let env = new Env(this.env),
+        bindings = this.ast.shift();
+    
     if (!Array.isArray(bindings) || bindings.length % 2 === 1) {
         throw new Exception('poorly formatted binding list');
     } else {
