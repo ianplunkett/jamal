@@ -1,5 +1,6 @@
 'use strict';
 var Exception = require('./exception.js');
+var Env = require('./Env.js');
 
 function Eval(env, ast) {
     this.env = env;
@@ -15,7 +16,7 @@ Eval.prototype.eval_ast = function() {
         return this.env.get(this.ast);
     case 'arithmetic':
         return this.env.get(this.ast);
-    case 'user_defined':
+    case 'def!':
         return this.env.get(this.ast).value;
     default:
         return this.ast;
@@ -25,10 +26,29 @@ Eval.prototype.eval_ast = function() {
 Eval.prototype.process_special = function(symbol) {
     if (symbol === 'def!') {
         return this.process_def();
+    } else if (symbol === 'let*') {
+        return this.process_let();
     } else {
-        return 'error!';
+        throw new Exception('unknown special symbol');
     }
-//    return evaled_first.value(first, new Eval(this.env, rest).eval_ast());
+};
+
+Eval.prototype.process_let = function() {
+    let env = new Env(this.env);
+    let bindings = this.ast.shift();
+    if (!Array.isArray(bindings) || bindings.length % 2 === 1) {
+        throw new Exception('poorly formatted binding list');
+    } else {
+        for (let i = 0; i < bindings.length; i += 2) {
+            let data = {
+                type: 'def!',
+                value: new Eval(env, bindings[i+1]).eval_ast()
+            };
+            
+            env.set(bindings[i], data);
+        }
+    }
+    return env.get(this.ast.shift()).value;
 };
 
 Eval.prototype.process_def = function() {
@@ -37,11 +57,11 @@ Eval.prototype.process_def = function() {
         rest = this.ast.shift();
 
     if (this.ast.length > 0) {
-        throw new Exception('improper special form invocation:' + evaled_first.value);
+        throw new Exception('improper special form invocation:' + first);
     }
 
     let data = {
-        type: 'user_defined',
+        type: 'def!',
         value: new Eval(this.env, rest).eval_ast()
     };
     this.env.set(first, data);
@@ -79,8 +99,8 @@ Eval.prototype.process_list = function() {
 
 Eval.prototype.ast_type = function() {
 
-    if (typeof this.env.get(this.ast) === 'object' && this.env.get(this.ast).type === 'user_defined') {
-        return 'user_defined';
+    if (typeof this.env.get(this.ast) === 'object' && this.env.get(this.ast).type === 'def!') {
+        return 'def!';
     }
     else if (Array.isArray(this.ast)) {
         return 'list';
