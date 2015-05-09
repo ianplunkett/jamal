@@ -41,6 +41,18 @@ function bootstrapEnv(env) {
     env.set('let*', {
             type: 'special'
     });
+
+    env.set('do', {
+            type: 'special'
+    });
+
+    env.set('if', {
+        type: 'special'
+    });
+
+    env.set('fn*', {
+        type: 'special'
+    });
     
     return env;
 }

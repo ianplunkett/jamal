@@ -28,9 +28,43 @@ Eval.prototype.process_special = function(symbol) {
         return this.process_def();
     } else if (symbol === 'let*') {
         return this.process_let();
+    } else if (symbol === 'do') {
+        return this.process_do();
+    } else if (symbol === 'if') {
+        return this.process_if();
+    } else if (symbol === 'fn*') {
+        return this.process_fn();
     } else {
         throw new Exception('unknown special symbol');
     }
+};
+
+Eval.prototype.process_do = function() {
+    let length = this.ast.length,
+        last;
+    
+    for(let i = 0; i < length; i++) {
+        last = new Eval(this.env, this.ast.shift()).eval_ast();
+    }
+    return last;
+};
+
+Eval.prototype.process_if = function() {
+    let length = this.ast.length;
+    if (length < 2 || length > 3) {
+        throw new Exception('improperly formatted if-then-else');
+    }
+
+    let test = new Eval(this.env, this.ast.shift()).eval_ast();
+    if (test !== 'nil' && test !== 'false') {
+        return new Eval(this.env, this.ast.shift()).eval_ast();
+    } else if (length === 2) {
+        return 'nil';
+    } else {
+        this.ast.shift();
+        return new Eval(this.env, this.ast.shift()).eval_ast();
+    }
+    
 };
 
 Eval.prototype.process_let = function() {
