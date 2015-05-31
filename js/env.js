@@ -1,7 +1,12 @@
-'use strict';
-var Exception = require('./exception.js');
-
-function Env(outer) {
+function Env(outer, binds, exprs) {
+    self = this;
+    if (typeof binds === 'object' && binds.length > 0) {
+        binds.map(
+            function(currentValue, index, array) {
+                self.set(currentValue, exprs[index]);
+            }
+        );
+    }
     this.outer = outer;
     this.data = {};
     return this;
@@ -13,22 +18,18 @@ Env.prototype.set = function(key, value) {
 };
 
 Env.prototype.find = function(key) {
-    if (typeof this.data[key] !== 'undefined') {
+    if (this.data[key]) {
         return this.data[key];
-    } else if (typeof this.outer !== 'undefined') {
+    } else if (typeof this.outer === 'object') {
         return this.outer.find(key);
     } else {
-        return false;
+        return 'symbol not found';
     }
 };
 
 Env.prototype.get = function(key) {
-    console.log(this);
-    let value  = this.find(key);
-    if (typeof value === 'undefined') {
-        throw new Exception('Key not found');
-    }
-    return value;
+    return this.find(key);
 };
+
 
 module.exports = Env;

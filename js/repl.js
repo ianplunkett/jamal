@@ -1,52 +1,91 @@
 'use strict';
-var Env = require('./env.js');
-var Eval = require('./eval.js');
-var Reader = require('./reader.js');
-var Printer = require('./printer.js');
-var Tokenizer = require('./tokenizer.js');
+let Env = require('./Env.js');
+let Eval = require('./Eval.js');
+let Printer = require('./Printer.js');
+let Reader = require('./Reader.js');
+let Tokenizer = require('./Tokenizer.js');
 
-/**
- * REPL
- */
-function READ(text) { return new Reader(new Tokenizer(text).tokenize()).read_str(); }
+function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }
 
-function EVAL(ast) { return new Eval(new Env()).run(ast); }
+function EVAL(env, ast) { return new Eval(env, ast).eval_ast(); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(text) { return PRINT(EVAL(READ(text)));}
-/**
- * END REPL
- */
+function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
 
+function bootstrapEnv(env) {
 
+    env.set('+', {
+        type: 'arithmetic',
+        value: (a,b) => a+b,
+        string: '+'
+    });
+    env.set('-', {
+        type: 'arithmetic',
+        value: (a,b) => a-b,
+        string: '-'
+    });
 
-// Add a main loop that repeatedly prints a prompt, gets a line of
-// input from the user, calls rep with that line of input, and then
-// prints out the result from rep. It should also exit when you send
-// it an EOF (often Ctrl-D).
+    env.set('*', {
+        type: 'arithmetic',
+        value: (a,b) => a*b,
+        string: '*'
+    });
+
+    env.set('/', {
+        type: 'arithmetic',
+        value: (a,b) => parseInt(a/b),
+        string: '/'
+    });
+
+    env.set('def!', {
+        type: 'special',
+        string: 'def!'
+    });
+
+    env.set('let*', {
+        type: 'special',
+        string: 'let*'
+    });
+
+    env.set('do', {
+        type: 'special',
+        string: 'do'
+    });
+
+    env.set('if', {
+        type: 'special',
+        string: 'if'
+    });
+
+    env.set('fn*', {
+        type: 'special',
+        string: 'fn*'
+    });
+    
+    return env;
+}
+
 function main() {
 
-    //Set our event handler to start listening to keyboard input.
-    process.stdin.resume();
-    process.stdin.setEncoding('utf8');
-    process.stdin.on('data', function (text) {
-        if (text === 'quit\r\n') {
-            done();
-        }
+    let env = bootstrapEnv(new Env());
+    let readline = require('readline'),
+        rl = readline.createInterface(process.stdin, process.stdout);
+    rl.setPrompt('user> ');
+    rl.prompt();
+
+    rl.on('line', function(line) {
         try {
-            rep(text);
+            console.log(rep(env, line));
         } catch(e) {
             console.log(e);
             console.log('try again');
         }
+        rl.prompt();
+    }).on('close', function() {
+        console.log('Have a great day!');
+        process.exit(0);
     });
-
-    // Terminate program if the text 'quit' is sent to STDOUT
-    function done() {
-        console.log('now that process.stdin is paused,  there is nothing more to do.');
-        process.exit();
-    }
 }
 
-var program = main();
+main();
