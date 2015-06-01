@@ -4,155 +4,160 @@ let Exception = require('./exception.js');
 
 function addition() {
     return {
+        name : '+',
         type : 'arithmetic',
-        string : '+',
         fn : (a,b) => a+b
     };
 }
 
 function subtraction() {
     return {
+        name : '-',
         type : 'arithmetic',
-        string : '-',
         fn : (a,b) => a-b
     };
 }
 
 function multiplication() {
     return {
+        name : '*',
         type : 'arithmetic',
-        string : '*',
         fn : (a,b) => a*b
     };
 }
 
 function division() {
     return {
+        name : '/',
         type : 'arithmetic',
-        string : '/',
         fn : (a,b) => parseInt(a/b)
     };
 }
 
 function def_() {
     return  {
-        type : 'special',
-        string : 'def!'
+        name : 'def!',
+        type : 'special'
     };
 }
 
 function let_() {
     return {
-        type : 'special',
-        string : 'let*'
+        name : 'let*',
+        type : 'special'
     };
 }
 
 function do_() {
     return {
-        type : 'special',
-        string : 'do'
+        name : 'do',
+        type : 'special'
     };
 }
 
 function if_() {
     return {
-        type : 'special',
-        string : 'if'
+        name : 'if',
+        type : 'special'
     };
 }
 
 function fn_() {
     return {
-        type : 'special',
-        string : 'fn*'
+        name : 'fn*',
+        type : 'special'
     };
 }
 
 function list() {
     return {
-        type : 'special',
-        string : 'fn*'
+        name : 'fn*',
+        type : 'special'
     };
 }
 
 function is_list() {
     return {
-        type : 'special',
-        string : 'list'
+        name : 'list',
+        type : 'special'
     };
 }
 
 function count() {
     return {
-        type: 'special',
-        string : 'count'
+        name : 'count',
+        type: 'special'
     };
 }
 
 function is_empty() {
     return {
-        type : 'special',
-        string : 'empty?'
+        name : 'empty?',
+        type : 'special'
     };
 }
 
 function is_equal() {
     return {
-        type : 'equality',
-        string : '='
+        name : '=',
+        type : 'equality'
     };
 }
 
 function is_greater_than() {
     return {
-        type : 'equality',
-        string : '>'
+        name : '>',
+        type : 'equality'
     };
 }
 
 function is_greater_than_or_equal() {
     return {
-        type : 'equality',
-        string : '>='
+        name : '>=',
+        type : 'equality'
     };
 }
 
 function is_less_than() {
     return {
-        type : 'equality',
-        string : '<'
+        name : '<',
+        type : 'equality'
     };
 }
 
 function is_less_than_or_equal() {
     return {
-        type : 'equality',
-        string : '<='
+        name : '<=',
+        type : 'equality'
     };
 }
 
 function Core(env) {
 
     let ns = {
+        // Arithmetic
         '+' : addition(),
         '-' : subtraction(),
         '*' : multiplication(),
         '/' : division(),
-        'def!' : def_(),
-        'let*' : let_(),
-        'do' : do_(),
-        'if' :  if_(),
-        'fn*' : fn_(),
-        'list': list(),
-        'list?': is_list(),
-        'count' : count(),
-        'empty?' : is_empty(),
-        '=' : is_equal(),
-        '>' : is_greater_than(),
+        
+        // Equality
+        '='  : is_equal(),
+        '>'  : is_greater_than(),
         '>=' : is_greater_than_or_equal(),
-        '<' : is_less_than(),
-        '<=' : is_less_than_or_equal()
+        '<'  : is_less_than(),
+        '<=' : is_less_than_or_equal(),
+        
+        // Generic Special Forms
+        'def!'   : def_(),
+        'do'     : do_(),
+        'count'  : count(),
+        'empty?' : is_empty(),
+        'fn*'    : fn_(),
+        'if'     : if_(),
+        'let*'   : let_(),
+        'list'   : list(),
+        'list?'  : is_list()
     };
 
     for (let specialForm in ns) {
