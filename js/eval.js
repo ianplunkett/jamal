@@ -10,16 +10,16 @@ function Eval(env, ast) {
 
 Eval.prototype.eval_ast = function() {
     switch (this.ast_type()) {
-    case 'list':
-        return this.process_list();
-    case 'special':
-        return this.env.get(this.ast);
-    case 'arithmetic':
-        return this.env.get(this.ast);
-    case 'def!':
-        return this.env.get(this.ast).value;
-    default:
-        return this.ast;
+        case 'list':
+            return this.process_list();
+        case 'special':
+            return this.env.get(this.ast);
+        case 'arithmetic':
+            return this.env.get(this.ast);
+        case 'def!':
+            return this.env.get(this.ast).value;
+        default:
+            return this.ast;
     }
 };
 
