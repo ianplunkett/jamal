@@ -1,5 +1,4 @@
 'use strict';
-var util = require('util');
 
 function Printer(malData) {
     this.malData = malData;
@@ -9,6 +8,9 @@ function Printer(malData) {
 Printer.prototype.build_str = function(dataString) {
 
     let output = '';
+    if (typeof dataString === 'Function') {
+        return "#<function>";
+    }
     if (dataString.type === 'arithmetic') {
         return dataString.string;
     } else if (!Array.isArray(dataString) ) {

@@ -117,7 +117,7 @@ Eval.prototype.process_arithmetic = function(symbol, symbol_value) {
     
     let first = new Eval(this.env, this.ast.shift()).eval_ast();
     let next =  new Eval(this.env, this.ast.shift()).eval_ast();
-    let result = symbol_value.value(first, next);
+    let result = symbol_value.fn(first, next);
     
     if (this.ast.length === 0) {
         return result;
@@ -133,12 +133,37 @@ Eval.prototype.process_list = function() {
     let symbol = this.ast.shift(),
         symbol_value = new Eval(this.env, symbol).eval_ast();
 
-    if(typeof symbol_value === 'object' && symbol_value.type === 'special'){
+    if (symbol === 'list') {
+        return this.ast;
+    } else if (symbol === 'list?') {
+        let isList = this.ast.shift();
+        if (isList[0] === 'list') {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (symbol === 'empty?') {
+        let isList = this.ast.shift();
+        if (isList[0] === 'list' && isList.length === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (symbol === 'count') {
+        let isList = this.ast.shift();
+        if (isList[0] === 'list') {
+            return isList.length - 1;
+        } else if (isList === 'nil') {
+            return 0;
+        } else {
+            throw Exception("count must take a list as it's paramter");
+        }
+    } else if (typeof symbol_value === 'object' && symbol_value.type === 'special'){
         return this.process_special(symbol);
     } else if(typeof symbol_value === 'object' && symbol_value.type === 'arithmetic') {
         return this.process_arithmetic(symbol, symbol_value);
     } else {
-        throw new Exception("I don't know how to process this type of list");
+        throw new Exception("I don't know how to process this type of list" + symbol);
     }
 };
 
@@ -146,8 +171,7 @@ Eval.prototype.ast_type = function() {
 
     if (typeof this.env.get(this.ast) === 'object' && this.env.get(this.ast).type === 'def!') {
         return 'def!';
-    }
-    else if (Array.isArray(this.ast)) {
+    } else if (Array.isArray(this.ast)) {
         return 'list';
     } else if (typeof this.ast === 'number') {
         return 'number';
