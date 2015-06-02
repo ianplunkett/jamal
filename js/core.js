@@ -149,15 +149,17 @@ function Core(env) {
         '<=' : is_less_than_or_equal(),
         
         // Generic Special Forms
-        'def!'   : def_(),
-        'do'     : do_(),
         'count'  : count(),
         'empty?' : is_empty(),
+        'list'   : list(),
+        'list?'  : is_list(),
+
+        'def!'   : def_(),
+        'do'     : do_(),
         'fn*'    : fn_(),
         'if'     : if_(),
-        'let*'   : let_(),
-        'list'   : list(),
-        'list?'  : is_list()
+        'let*'   : let_()
+
     };
 
     for (let specialForm in ns) {
