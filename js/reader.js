@@ -31,10 +31,23 @@ Reader.prototype.peek = function() {
 };
 
 Reader.prototype.read_form = function() {
+    let malData = [];
+
+    switch (this.peek()) {
+        case '(':
+            malData = this.read_list();
+        case '[':
+            malData = this.read_vector();
+        case ':':
+            malData = this.read_keyword();
+        case '"':
+            malData = this.read_string();
+    }
+    
     let token = this.peek(),
         malData = [];
     if (token === '(') {
-        malData = this.read_list();
+
     } else {
         malData = this.read_atom();
     }
