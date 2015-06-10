@@ -2,7 +2,7 @@
 let Exception = require('./exception.js');
 
 function Reader(tokens) {
-    this.tokens = tokens, 
+    this.tokens = tokens,
     this.position = 0;
     return this;
 }
@@ -10,7 +10,7 @@ function Reader(tokens) {
 Reader.prototype.read_str = function() {
     let programData = this.read_form();
     if(this.tokens.length !== this.position) {
-        throw new Exception('EOF Error - Invalid Syntax');
+        throw new Exception('read_str: EOF Error - Invalid Syntax');
     }
     return programData;
 };
@@ -18,7 +18,7 @@ Reader.prototype.read_str = function() {
 //next returns the token at the current position and increments the position.
 Reader.prototype.next = function() {
     if (this.position > this.tokens.length) {
-        throw new Exception('EOF Error - Invalid Syntax');
+        throw new Exception('next: EOF Error - Invalid Syntax');
     }
     var token = this.tokens[this.position];
     this.position++;
@@ -34,8 +34,9 @@ Reader.prototype.read_form = function() {
     let malData = [];
 
     switch (this.peek()) {
-        case '(':
+        case '(' || ')':
             malData = this.read_list();
+            break;
             /*
         case '[':
             malData = this.read_vector();
@@ -63,8 +64,7 @@ Reader.prototype.read_list = function() {
     }
 
     return {
-        type: 'list',
-        data: list
+        list: list
     };
 };
 
