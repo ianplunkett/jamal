@@ -1,6 +1,6 @@
 'use strict';
 var Exception = require('./exception.js');
-var Env = require('./env.js');
+var Env = require('./Env.js');
 
 function Eval(env, ast) {
     this.env = env;
@@ -8,22 +8,19 @@ function Eval(env, ast) {
     return this;
 }
 
-function eval_ast(ast, env) {
+Eval.prototype.eval_ast = function() {
     switch (this.ast_type()) {
-        case 'symbol':
-            return this.process_symbol();
         case 'list':
             return this.process_list();
-        case 'vector':
-            return this.process_vector();
-        case 'hash-map':
-            return this.process_hash_map();
+        case 'special':
+            return this.env.get(this.ast);
+        case 'arithmetic':
+            return this.env.get(this.ast);
+        case 'def!':
+            return this.env.get(this.ast).value;
         default:
             return this.ast;
     }
-}
-
-Eval.prototype.eval_ast = function() {
 };
 
 Eval.prototype.process_special = function(symbol) {
