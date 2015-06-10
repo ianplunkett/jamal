@@ -2,7 +2,7 @@
 let Exception = require('./exception.js');
 
 function Reader(tokens) {
-    this.tokens = tokens;
+    this.tokens = tokens, 
     this.position = 0;
     return this;
 }
@@ -36,35 +36,36 @@ Reader.prototype.read_form = function() {
     switch (this.peek()) {
         case '(':
             malData = this.read_list();
+            /*
         case '[':
             malData = this.read_vector();
         case ':':
             malData = this.read_keyword();
         case '"':
             malData = this.read_string();
+*/
+        default:
+            malData = this.read_atom();
     }
     
-    let token = this.peek(),
-        malData = [];
-    if (token === '(') {
-
-    } else {
-        malData = this.read_atom();
-    }
     return malData;
 };
 
 Reader.prototype.read_list = function() {
     let list = [],
         token = this.next();
-
+    
     while (token !== ')') {
         if (token !== '(') {
             list.push(token);
         }
         token = this.read_form();
     }
-    return list;
+
+    return {
+        type: 'list',
+        data: list
+    };
 };
 
 Reader.prototype.read_atom = function() {
