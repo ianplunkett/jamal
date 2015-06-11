@@ -31,50 +31,47 @@ Reader.prototype.peek = function() {
 };
 
 Reader.prototype.read_form = function() {
-    let malData = [];
-
+    /** switch on complex types or default to atom processing */
     switch (this.peek()) {
         case '(' || ')':
-            malData = this.read_list();
-            break;
-            /*
-        case '[':
-            malData = this.read_vector();
-        case ':':
-            malData = this.read_keyword();
-        case '"':
-            malData = this.read_string();
-*/
+            /** List */
+            return this.read_complex_type('list', ['(', ')']);
+        case '[' || ']':
+            /** Vector */
+            return  this.read_complex_type('vector', ['[', ']']);
+            /** Hash Map */
+        case '{' || '}':
+            return  this.read_complex_type('hashmap', ['{', '}']);
         default:
-            malData = this.read_atom();
+            return this.read_atom();
     }
-    
-    return malData;
 };
 
-Reader.prototype.read_list = function() {
+Reader.prototype.read_complex_type = function(type, delimiters) {
     let list = [],
+        obj = {},
         token = this.next();
     
-    while (token !== ')') {
-        if (token !== '(') {
+    while (true) {
+        if (token.symbol === delimiters[1]) {
+            break;
+        } else if (token !== delimiters[0]) {
             list.push(token);
         }
         token = this.read_form();
     }
 
-    return {
-        list: list
-    };
+    obj[type] = list;
+    return obj;
 };
 
 Reader.prototype.read_atom = function() {
     let atom  = this.next();
-    let regexp = /^\d+$/;
-    if (regexp.test(atom)) {
-        return parseInt(atom);
+    let digit_test = /^\d+$/;
+    if (digit_test.test(atom)) {
+        return {integer: parseInt(atom)};
     } else {
-        return atom;
+        return {symbol: atom};
     }
 };
 
