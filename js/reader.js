@@ -67,10 +67,28 @@ Reader.prototype.read_complex_type = function(type, delimiters) {
 
 Reader.prototype.read_atom = function() {
     let atom  = this.next();
-    let digit_test = /^\d+$/;
-    if (digit_test.test(atom)) {
+
+    let data_types = {
+        "nil"                : /^nil$/,
+        "true"               : /^true$/,
+        "false"              : /^false$/,
+        "digit"              : /^\d+$/,
+        "keyword"            : /^:/,
+        "string"             : /^".*"$/,
+        "quote"              : /^'/,
+        "quasiquote"         : /^`/,
+        "unquote"            : /^~/,
+        "splice-unquote"     : /^~@/,
+        "whole-line-comment" : /^;;/,
+        "deref"              : /^@/
+    };
+
+    
+    
+    if (data_types.test(atom)) {
         return {integer: parseInt(atom)};
-    } else {
+    } else if (data_types.test(atom)){
+        
         return {symbol: atom};
     }
 };
