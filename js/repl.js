@@ -13,7 +13,9 @@ function EVAL(env, ast) { return new Eval(env, ast).eval_ast(); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
+// function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
+// Short-circuiting EVAL to test new data types
+function rep(env, text) { return PRINT(READ(text));}
 
 function main() {
 

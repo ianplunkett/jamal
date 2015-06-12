@@ -66,7 +66,9 @@ Reader.prototype.read_complex_type = function(type, delimiters) {
 };
 
 Reader.prototype.read_atom = function() {
-    let atom  = this.next();
+    
+    let atom  = this.next(),
+        obj   = {};
 
     let data_types = {
         "nil"                : /^nil$/,
@@ -80,17 +82,19 @@ Reader.prototype.read_atom = function() {
         "unquote"            : /^~/,
         "splice-unquote"     : /^~@/,
         "whole-line-comment" : /^;;/,
+        "with-meta"          : /^\^/,
         "deref"              : /^@/
     };
 
-    
-    
-    if (data_types.test(atom)) {
-        return {integer: parseInt(atom)};
-    } else if (data_types.test(atom)){
-        
-        return {symbol: atom};
+    for (let regex in data_types) {
+        if (data_types.hasOwnProperty(regex) && data_types[regex].test(atom)) {
+            obj[regex] = atom;
+            return obj;
+        }
     }
+
+    return {symbol: atom};
+
 };
 
 module.exports = Reader;
