@@ -1,5 +1,6 @@
 'use strict';
-let Exception = require('./exception.js');
+let Exception = require('./exception.js'),
+    Type = require('./types.js');
 
 function Reader(tokens) {
     this.tokens = tokens,
@@ -15,7 +16,7 @@ Reader.prototype.read_str = function() {
     return programData;
 };
 
-//next returns the token at the current position and increments the position.
+/** next returns the token at the current position and increments the position. */
 Reader.prototype.next = function() {
     if (this.position > this.tokens.length) {
         throw new Exception('next: EOF Error - Invalid Syntax');
