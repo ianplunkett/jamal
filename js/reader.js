@@ -26,29 +26,35 @@ Reader.prototype.next = function() {
     return token;
 };
 
-//peek just returns the token at the current position.
+/** peek just returns the token at the current position. */
 Reader.prototype.peek = function() {
     return this.tokens[this.position];
 };
 
 Reader.prototype.read_form = function() {
+
     /** switch on complex types or default to atom processing */
-    switch (this.peek()) {
-        case '(' || ')':
-            /** List */
-            return this.read_complex_type('list', ['(', ')']);
-        case '[' || ']':
-            /** Vector */
-            return  this.read_complex_type('vector', ['[', ']']);
-            /** Hash Map */
-        case '{' || '}':
-            return  this.read_complex_type('hashmap', ['{', '}']);
+    let current_token = this.peek(),
+        typed_token = new Type(current_token);
+    
+    switch (typed_token.form) {
+        case 'list':
+            /** List Form */
+            return this.complex_type(typed_token);
+            /** Key Value Form */
+        case 'key-value-pair':
+            return this.key_value_pair(typed_token);
         default:
-            return this.read_atom();
+            /** Atom Form */
+            return typed_token.ast;
     }
 };
 
-Reader.prototype.read_complex_type = function(type, delimiters) {
+Reader.prototype.key_value_pair = function() {
+
+};
+
+Reader.prototype.complex_type = function(type, delimiters) {
     let list = [],
         obj = {},
         token = this.next();
@@ -73,30 +79,7 @@ Reader.prototype.read_atom = function() {
     let atom  = this.next(),
         obj   = {};
 
-    let data_types = {
-        
-        // Working properly
-        "nil"                : /^nil$/,
-        "boolean"            : /^true|false$/,
-        "integer"            : /^\d+$/,
-        "string"             : /^".*"$/,
-        "whole-line-comment" : /^;;/,
-        "with-meta"          : /^\^/,
-        "deref"              : /^@/,
-
-        // Complex data types, treat as key/value pair
-        "quote"              : /^'/,
-        "quasiquote"         : /^`/,
-        "unquote"            : /^~/,
-        "splice-unquote"     : /^~@/,
-        "comment-after-exp"  : /^;.*$/,
-
-        // TODO: map unicode internal representation 0x29E 
-        "keyword"            : /^:/
-
-
-    };
-
+    let data_types = new Types();
     for (let regex in data_types) {
         if (data_types.hasOwnProperty(regex) && data_types[regex].test(atom)) {
             obj[regex] = atom;
