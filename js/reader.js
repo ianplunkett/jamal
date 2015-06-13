@@ -66,24 +66,34 @@ Reader.prototype.read_complex_type = function(type, delimiters) {
 };
 
 Reader.prototype.read_atom = function() {
-    
+
+    // TODO: move these data types out into their own module for shared access 
+
     let atom  = this.next(),
         obj   = {};
 
     let data_types = {
+        
+        // Working properly
         "nil"                : /^nil$/,
-        "true"               : /^true$/,
-        "false"              : /^false$/,
-        "digit"              : /^\d+$/,
-        "keyword"            : /^:/,
+        "boolean"            : /^true|false$/,
+        "integer"            : /^\d+$/,
         "string"             : /^".*"$/,
+        "whole-line-comment" : /^;;/,
+        "with-meta"          : /^\^/,
+        "deref"              : /^@/,
+
+        // Complex data types, treat as key/value pair
         "quote"              : /^'/,
         "quasiquote"         : /^`/,
         "unquote"            : /^~/,
         "splice-unquote"     : /^~@/,
-        "whole-line-comment" : /^;;/,
-        "with-meta"          : /^\^/,
-        "deref"              : /^@/
+        "comment-after-exp"  : /^;.*$/,
+
+        // TODO: map unicode internal representation 0x29E 
+        "keyword"            : /^:/
+
+
     };
 
     for (let regex in data_types) {
