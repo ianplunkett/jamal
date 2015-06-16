@@ -1,6 +1,6 @@
 'use strict';
 let Exception = require('./exception.js'),
-    Type = require('./types.js');
+    Type = require('./type.js');
 
 function Reader(tokens) {
     this.tokens = tokens,
@@ -46,7 +46,7 @@ Reader.prototype.read_form = function() {
             return this.key_value_pair(typed_token);
         default:
             /** Atom Form */
-            return typed_token.ast;
+            return this.atom(typed_token);
     }
 };
 
@@ -72,20 +72,12 @@ Reader.prototype.complex_type = function(type, delimiters) {
     return obj;
 };
 
-Reader.prototype.read_atom = function() {
+Reader.prototype.atom = function() {
 
     // TODO: move these data types out into their own module for shared access 
 
     let atom  = this.next(),
         obj   = {};
-
-    let data_types = new Types();
-    for (let regex in data_types) {
-        if (data_types.hasOwnProperty(regex) && data_types[regex].test(atom)) {
-            obj[regex] = atom;
-            return obj;
-        }
-    }
 
     return {symbol: atom};
 
