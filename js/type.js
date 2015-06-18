@@ -62,13 +62,17 @@ function Type(token) {
     
     for (let type in types) {
         if (types.hasOwnProperty(type) && types[type].regex.test(token)) {
+            let typed_token = {};
             types[type].value = token;
-            delete types[type].regex;
-            return types[type];
+            if (types[type].hasOwnProperty('fn')) {
+                token = types[type].fn(token);
+            }
+            typed_token[type] = token;
+            return typed_token;
         }
     }
 
-    return null;
+    return {symbol: token};
     
     /**
      Type Classes:

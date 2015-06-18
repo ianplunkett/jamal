@@ -72,14 +72,12 @@ Reader.prototype.complex_type = function(type, delimiters) {
     return obj;
 };
 
-Reader.prototype.atom = function() {
+Reader.prototype.atom = function(typed_token) {
 
-    // TODO: move these data types out into their own module for shared access 
-
-    let atom  = this.next(),
-        obj   = {};
-
-    return {symbol: atom};
+    // Increment to the next token, but throw it on the ground. We
+    // already have the typed token.
+    this.next();
+    return typed_token;
 
 };
 
