@@ -1,78 +1,52 @@
 'use strict';
-function Type(token) {
 
-    let types = {
-        
-        "nil" : {
-            form  : 'atom',
-            regex : /^nil$/
-        },
-        "boolean" : {
-            form  : 'atom',
-            regex : /^true|false$/
-        },
-        "integer" : {
-            form  : 'atom',
-            regex : /^\d+$/,
-            fn    : char => parseInt(char)
-        },
-        "string" : {
-            form  : 'atom',
-            regex : /^".*"$/
-        },
-        // TODO: map unicode internal representation 0x29E 
-        "keyword" : {
-            form  : 'atom',
-            regex : /^:/,
-            fn    : string => string.replace(/:/,'\u029E')
-        },
-        "whole-line-comment" : {
-            form  : 'atom',
-            regex : /^;;/
-        },
+function atom(token) {
 
-        // Complex data types, treat as key/value pair
-        "quote" : {
-            form  : 'key-value-pair',
-            regex : /^'/
-        },
-        "quasiquote" : {
-            form  : 'key-value-pair',
-            regex : /^`/
-        },
-        "unquote" : {
-            form  : 'key-value-pair',
-            regex : /^~/
-        },
-        "splice-unquote" : {
-            form  : 'key-value-pair',
-            regex : /^~@/
-        },
-        "comment-after-exp" : {
-            form  : 'key-value-pair',
-            regex : /^;.*$/
-        },
-        "deref": {
-            form  : 'key-value-pair',
-            regex :  /^@/
-        }
-        // TODO: I don't really understand this one yet...
-        // "with-meta"          : /^\^/
-    };
-    
-    for (let type in types) {
-        if (types.hasOwnProperty(type) && types[type].regex.test(token)) {
-            let typed_token = {};
-            types[type].value = token;
-            if (types[type].hasOwnProperty('fn')) {
-                token = types[type].fn(token);
-            }
-            typed_token[type] = token;
+    const forms = [
+        /**  atoms */
+        [ 'nil', /^nil$/ ],
+        [ 'boolean', /^true|false$/ ],
+        [ 'integer', /^\d+$/, string => parseInt(string) ]
+        [ 'string',  /^".*"$/ ],
+        [ 'keyword', /^:/, string => string.replace(/:/,'\u029E') ],
+        [ 'whole-line-comment',  /^;;/ ]
+    ];
+
+    let typed_token = {};
+
+    for (let form of forms) {
+        if (form[1].test(token) && form.length > 2) {
+            typed_token.form[0] = form[2](token);
+            return typed_token;
+        } else if (form[1].test(token)) {
+            typed_token.form[0] = token;
             return typed_token;
         }
+        
     }
 
-    return {symbol: token};
+    return { symbol : token };
+}
+
+function Type(token) {
+
+    return atom(token);
+
+        /** two item list 
+        [ 'pair', 'quote',  "'" ],
+        [ 'pair', 'quasiquote', "`" ],
+        [ 'pair', 'unquote', "~" ],
+        [ 'pair', 'splice-unquote', "~@" ],
+        [ 'pair', 'comment-after-exp', /^;.*$/]
+        [ 'pair', 'deref', /^@/ ]
+        /** lists of undetermined length 
+        [ 'list', 'list', '(' ],
+        [ 'list', 'vector', '[' ],
+        [ 'list', 'hash-map', '{' ]
+        /** 
+         TODO: I don't really understand this one yet...
+         ['with-meta',/^\^/ ]
+         */
     
     /**
      Type Classes:
