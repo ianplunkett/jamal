@@ -23,7 +23,7 @@ function atom(token) {
 	    transform : string => string.replace(/:/,'\u029E')
 	}, {
 	    type  : 'whole-line-comment',
-	    regex :/^;;/ 
+	    regex :/^;;/
         }
     ];
 
@@ -53,8 +53,8 @@ function pair(token) {
     let typed_token = {form : 'pair'};
     let forms = [
 	{
-	    type      : 'quote',  
-	    character : "'" 
+	    type      : 'quote',
+	    character : "'"
 	}, {
 	    type      : 'quasiquote',
 	    character : "`"
@@ -85,14 +85,42 @@ function pair(token) {
     return typed_token;
 }
 
-function list() {
+function list(token) {
+    let typed_token = {form : 'list'};
+    let forms = [
+	{
+	    type  : 'list',
+	    begin : "(",
+	    end   : ")"
 
+	}, {
+	    type  : 'vector',
+	    begin : "[",
+	    end   : "]"
+	}, {
+	    type  : 'hash-map',
+	    begin : "{",
+	    end   : "}"
+	}
+    ];
+
+    let value = {};
+    for (let form of forms) {
+	if (form.begin === token) {
+	    typed_token.value  = form.type;
+	    typed_token.begin = form.begin;
+	    typed_token.end = form.end;
+	    break;
+	}
+    }
+
+    return typed_token;
 }
 
 function Type(token) {
 
     let typed_token = {};
-    
+
     if (token.length <= 2) {
 	typed_token = pair(token);
     }
@@ -105,26 +133,12 @@ function Type(token) {
 	typed_token = atom(token);
     }
 
-    console.log(typed_token);
     return typed_token;
-
-    /** two item list
-     /** lists of undetermined length
-     [ 'list', 'list', '(' ],
-     [ 'list', 'vector', '[' ],
-     [ 'list', 'hash-map', '{' ]
      /**
      TODO: I don't really understand this one yet...
      ['with-meta',/^\^/ ]
      */
 
-    /**
-     Type Classes:
-     - Atom Type
-     - Key/Value Type
-     - List Type
-     - W/meta???
-     */
 }
 
 module.exports = Type;

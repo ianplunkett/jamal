@@ -40,29 +40,30 @@ Reader.prototype.read_form = function() {
     switch (typed_token.form) {
         case 'list':
             /** List Form */
-            return this.complex_type(typed_token);
+            return this.list(typed_token);
             /** Key Value Form */
-        case 'key-value-pair':
-            return this.key_value_pair(typed_token);
+        case 'pair':
+            return this.pair(typed_token);
         default:
             /** Atom Form */
             return this.atom(typed_token);
     }
 };
 
-Reader.prototype.key_value_pair = function() {
+Reader.prototype.pair = function(typed_token) {
 
 };
 
-Reader.prototype.complex_type = function(type, delimiters) {
+Reader.prototype.list = function(typed_token) {
     let list = [],
         obj = {},
-        token = this.next();
+        token = this.next(),
+	type = typed_token.value;
     
     while (true) {
-        if (token.symbol === delimiters[1]) {
+        if (token.symbol === typed_token.end) {
             break;
-        } else if (token !== delimiters[0]) {
+        } else if (token !== typed_token.begin) {
             list.push(token);
         }
         token = this.read_form();
