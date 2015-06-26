@@ -7,9 +7,15 @@ function Printer(malData) {
     return this;
 }
 
-Printer.prototype.build_str = function(dataString) {
+Printer.prototype.build_str = function(ast) {
 
     let output = '';
+
+    // TOOD: we can't assume this will work. we are creating an array
+    // of the object keys and blindly considering it as the only key.
+    let type = new Type(ast);
+    
+    
     if (dataString.type === 'arithmetic') {
         return dataString.name;
     } else if (!Array.isArray(dataString) ) {
@@ -33,10 +39,7 @@ Printer.prototype.build_str = function(dataString) {
 };
 
 Printer.prototype.pr_str = function() {
-    let output = this.build_str(this.malData);
-    // TODO: DANGEROUS
-    let type = Object.keys(output).pop();
-    return output[type];//JSON.stringify(output);
+    return this.build_str(this.malData);
 };
 
 

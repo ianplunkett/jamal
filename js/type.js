@@ -119,21 +119,30 @@ function list(token) {
 
 function Type(token) {
 
-    let typed_token = {};
+    
 
-    if (token.length <= 2) {
-	typed_token = pair(token);
+    if (typeof(token) === 'string') {
+	
+	let typed_token = {};
+
+	if (token.length <= 2) {
+	    typed_token = pair(token);
+	}
+
+	if (token.length <= 2 && !typed_token.hasOwnProperty('value')) {
+	    typed_token = list(token);
+	}
+
+	if (!typed_token.hasOwnProperty('value')) {
+	    typed_token = atom(token);
+	}
+
+	return typed_token;
+    } else {
+	const type = Object.keys(token).pop();
+	return type;
     }
-
-    if (token.length <= 2 && !typed_token.hasOwnProperty('value')) {
-	typed_token = list(token);
-    }
-
-    if (!typed_token.hasOwnProperty('value')) {
-	typed_token = atom(token);
-    }
-
-    return typed_token;
+    
      /**
      TODO: I don't really understand this one yet...
      ['with-meta',/^\^/ ]
