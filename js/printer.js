@@ -1,4 +1,6 @@
 'use strict';
+let Exception = require('./exception.js'),
+    Type = require('./type.js');
 
 function Printer(malData) {
     this.malData = malData;
@@ -32,7 +34,9 @@ Printer.prototype.build_str = function(dataString) {
 
 Printer.prototype.pr_str = function() {
     let output = this.build_str(this.malData);
-    return output;
+    // TODO: DANGEROUS
+    let type = Object.keys(output).pop();
+    return output[type];//JSON.stringify(output);
 };
 
 
