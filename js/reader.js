@@ -51,7 +51,13 @@ Reader.prototype.read_form = function() {
 };
 
 Reader.prototype.pair = function(typed_token) {
+    let list = [],
+	token = this.next();
 
+    list.push(typed_token.value);
+    token = this.read_form();
+    list.push(token);
+    return list;
 };
 
 Reader.prototype.list = function(typed_token) {
