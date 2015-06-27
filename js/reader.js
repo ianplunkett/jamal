@@ -51,32 +51,28 @@ Reader.prototype.read_form = function() {
 };
 
 Reader.prototype.pair = function(typed_token) {
-    let list = [],
-	token = this.next();
-
-    list.push(typed_token.value);
-    token = this.read_form();
-    list.push(token);
-    return list;
+    let token = this.next();
+    typed_token.value = this.read_form();
+    return typed_token;
 };
 
 Reader.prototype.list = function(typed_token) {
     let list = [],
         obj = {},
         token = this.next(),
-	type = typed_token.value;
+        type = typed_token.value;
     
     while (true) {
-        if (token.symbol === typed_token.end) {
+        if (token.value === typed_token.end) {
             break;
         } else if (token !== typed_token.begin) {
             list.push(token);
         }
         token = this.read_form();
     }
-
-    obj[type] = list;
-    return obj;
+    typed_token.type  = type;
+    typed_token.value = list;
+    return typed_token;
 };
 
 Reader.prototype.atom = function(typed_token) {
@@ -84,7 +80,7 @@ Reader.prototype.atom = function(typed_token) {
     // Increment to the next token, but throw it on the ground. We
     // already have the typed token.
     this.next();
-    return typed_token.value;
+    return typed_token;
 
 };
 
