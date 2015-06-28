@@ -3,13 +3,14 @@ let Exception = require('./exception.js'),
     Type = require('./type.js');
 
 function Reader(tokens) {
-    this.tokens = tokens,
+    this.tokens = tokens;
     this.position = 0;
     return this;
 }
 
 Reader.prototype.read_str = function() {
     let programData = this.read_form();
+
     if (this.tokens.length > this.position + 1) {
         throw new Exception('read_str: EOF Error - Invalid Syntax');
     } else if (this.tokens.length > this.position) {
@@ -24,7 +25,7 @@ Reader.prototype.read_str = function() {
 /** next returns the token at the current position and increments the position. */
 Reader.prototype.next = function() {
     if (this.position > this.tokens.length) {
-        throw new Exception('next: EOF Error - Invalid Syntax');
+        throw new Exception('EOF Error - Invalid Syntax');
     }
     var token = this.tokens[this.position];
     this.position++;
