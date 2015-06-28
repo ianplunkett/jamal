@@ -7,3 +7,5 @@
    test harness to ensure we aren't breaking things, then we can go
    back and do some refactoring to get the environment issues squared
    away.
+** Implementing a type system. Naive <2015-06-19 Fri>
+   Think about homoiconicity

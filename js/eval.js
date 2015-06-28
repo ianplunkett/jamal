@@ -1,6 +1,7 @@
 'use strict';
-var Exception = require('./exception.js');
-var Env = require('./Env.js');
+
+let Exception = require('./exception.js'),
+    Env = require('./env.js');
 
 function Eval(env, ast) {
     this.env = env;
@@ -115,9 +116,9 @@ Eval.prototype.process_def = function() {
 
 Eval.prototype.process_arithmetic = function(symbol, symbol_value) {
     
-    let first = new Eval(this.env, this.ast.shift()).eval_ast();
-    let next =  new Eval(this.env, this.ast.shift()).eval_ast();
-    let result = symbol_value.fn(first, next);
+    let first = new Eval(this.env, this.ast.shift()).eval_ast(),
+        next =  new Eval(this.env, this.ast.shift()).eval_ast(),
+        result = symbol_value.fn(first, next);
     
     if (this.ast.length === 0) {
         return result;

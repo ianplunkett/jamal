@@ -1,10 +1,11 @@
 'use strict';
-let Core = require('./core.js');
-let Env = require('./env.js');
-let Eval = require('./eval.js');
-let Printer = require('./printer.js');
-let Reader = require('./reader.js');
-let Tokenizer = require('./tokenizer.js');
+
+let Core      = require('./core.js'),
+    Env       = require('./env.js'),
+    Eval      = require('./eval.js'),
+    Printer   = require('./printer.js'),
+    Reader    = require('./reader.js'),
+    Tokenizer = require('./tokenizer.js');
 
 
 function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }
@@ -13,13 +14,16 @@ function EVAL(env, ast) { return new Eval(env, ast).eval_ast(); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
+// function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
+// Short-circuiting EVAL to test new data types
+function rep(env, text) { return PRINT(READ(text));}
 
 function main() {
 
-    let env = Core(new Env());
-    let readline = require('readline'),
-        rl = readline.createInterface(process.stdin, process.stdout);
+    let env = Core(new Env()),
+        readline = require('readline'),
+        rl = readline.createInterface(process.stdin, process.stdout, '', false);
+
     rl.setPrompt('user> ');
     rl.prompt();
 
