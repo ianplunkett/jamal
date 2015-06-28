@@ -19,8 +19,7 @@ function atom(token) {
             transform :integer => parseInt(integer)
         }, {
             type  : 'keyword',
-            regex : /^:/,
-            transform : string => string.replace(/:/,'\u029E')
+            regex : /^:/
         }, {
             type  : 'whole-line-comment',
             regex :/^;;/
