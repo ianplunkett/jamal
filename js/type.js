@@ -16,13 +16,16 @@ function atom(token) {
         }, {
             type  : 'integer',
             regex : /^\d+$/,
-            transform :integer => parseInt(integer)
+            transform : integer => parseInt(integer)
         }, {
             type  : 'keyword',
             regex : /^:/
         }, {
             type  : 'whole-line-comment',
-            regex :/^;;/
+            regex : /^;;/
+        }, {
+            type      : 'comment-after-exp',
+            regex : /^;/
         }
     ];
 
@@ -72,9 +75,6 @@ function pair(token) {
             character : "~@",
             begin     : '(splice-unquote',
             end       : ')'
-        }, {
-            type      : 'comment-after-exp',
-            character : ";"
         }, {
             type      : 'deref',
             character : "@",

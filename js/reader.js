@@ -10,8 +10,13 @@ function Reader(tokens) {
 
 Reader.prototype.read_str = function() {
     let programData = this.read_form();
-    if(this.tokens.length !== this.position) {
+    if (this.tokens.length > this.position + 1) {
         throw new Exception('read_str: EOF Error - Invalid Syntax');
+    } else if (this.tokens.length > this.position) {
+        var comment = this.read_form();
+        if (!comment.type === "comment-after-exp") {
+            throw new Exception('read_str: EOF Error - Invalid Syntax');
+        }
     }
     return programData;
 };
