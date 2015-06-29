@@ -23,7 +23,7 @@ Env.prototype.find = function(key) {
     } else if (typeof this.outer === 'object') {
         return this.outer.find(key);
     } else {
-        return 'symbol not found';
+        return false;
     }
 };
 
