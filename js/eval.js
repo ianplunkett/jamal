@@ -3,26 +3,27 @@
 let Exception = require('./exception.js'),
     Env = require('./env.js');
 
-function Eval(env, ast) {
-    this.env = env;
+function Eval(ast, env) {
     this.ast = ast;
+    this.env = env;
     return this;
 }
 
 Eval.prototype.eval_ast = function() {
-    switch (this.ast_type()) {
+    switch (this.ast.type) {
         case 'list':
             return this.process_list();
-        case 'special':
-            return this.env.get(this.ast);
-        case 'arithmetic':
-            return this.env.get(this.ast);
-        case 'def!':
-            return this.env.get(this.ast).value;
+        case 'vector':
+            return this.process_vector();
+        case 'hash-map':
+            return this.process_hashmap();
+        case 'symbol':
+            return this.env.get(this.ast.value);
         default:
             return this.ast;
     }
 };
+
 
 Eval.prototype.process_special = function(symbol) {
     if (symbol === 'def!') {
@@ -46,7 +47,7 @@ Eval.prototype.process_fn = function() {
         let binds = this.ast.shift();
         let exprs = this.ast.shift();
         this.env = new Env(self.env, binds, exprs);
-        return new Eval(this.env, this.ast.shift()).eval_ast();
+        return new Eval(this.ast.shift(), this.env).eval_ast();
     };
 };
 
@@ -114,73 +115,42 @@ Eval.prototype.process_def = function() {
     return this.env.get(first).value;
 };
 
-Eval.prototype.process_arithmetic = function(symbol, symbol_value) {
-    
-    let first = new Eval(this.env, this.ast.shift()).eval_ast(),
-        next =  new Eval(this.env, this.ast.shift()).eval_ast(),
-        result = symbol_value.fn(first, next);
-    
-    if (this.ast.length === 0) {
-        return result;
-    } else {
-        let new_list = [symbol,result].concat(this.ast);
-        return new Eval(this.env, new_list).eval_ast();
-    }
-
-};
-
 Eval.prototype.process_list = function() {
 
-    let symbol = this.ast.shift(),
-        symbol_value = new Eval(this.env, symbol).eval_ast();
+    let list = this.ast.value,
+        head = list.shift(),
+        symbol_env = new Eval(head, this.env).eval_ast(),
+        result = symbol_env.base_case;
 
-    if (symbol === 'list') {
-        return this.ast;
-    } else if (symbol === 'list?') {
-        let isList = this.ast.shift();
-        if (isList[0] === 'list') {
-            return true;
-        } else {
-            return false;
-        }
-    } else if (symbol === 'empty?') {
-        let isList = this.ast.shift();
-        if (isList[0] === 'list' && isList.length === 1) {
-            return true;
-        } else {
-            return false;
-        }
-    } else if (symbol === 'count') {
-        let isList = this.ast.shift();
-        if (isList[0] === 'list') {
-            return isList.length - 1;
-        } else if (isList === 'nil') {
-            return 0;
-        } else {
-            throw Exception("count must take a list as it's paramter");
-        }
-    } else if (typeof symbol_value === 'object' && symbol_value.type === 'special'){
-        return this.process_special(symbol);
-    } else if(typeof symbol_value === 'object' && symbol_value.type === 'arithmetic') {
-        return this.process_arithmetic(symbol, symbol_value);
-    } else {
-        throw new Exception("I don't know how to process this type of list" + symbol);
+    for (head of list) {
+        let evaled_head = new Eval(head, this.env).eval_ast();
+        result = symbol_env.fn(result.value, evaled_head.value);
     }
+    
+    return result;
 };
 
-Eval.prototype.ast_type = function() {
 
-    if (typeof this.env.get(this.ast) === 'object' && this.env.get(this.ast).type === 'def!') {
-        return 'def!';
-    } else if (Array.isArray(this.ast)) {
-        return 'list';
-    } else if (typeof this.ast === 'number') {
-        return 'number';
-    } else if (typeof this.env.get(this.ast) === 'object') {
-        return this.env.get(this.ast).type;
-    } else {
-        return 'symbol';
+Eval.prototype.process_vector = function() {
+    let list = this.ast.value,
+        processed_list = [];
+    for (let item of list) {
+        let evaled_item = new Eval(item, this.env).eval_ast();
+        processed_list.push(evaled_item);
     }
+    this.ast.value = processed_list;
+    return this.ast;
+};
+
+Eval.prototype.process_hashmap = function() {
+    let key = this.ast.value.shift(),
+        value = this.ast.value.shift();
+    if (this.ast.value.length > 0 || (key.type !== 'string' && key.type !== 'keyword')) {
+        throw Exception("Invalid hash-map!");
+    } 
+    let evaled_value = new Eval(value, this.env).eval_ast();
+    this.ast.value = [key, evaled_value];
+    return this.ast;
 };
 
 module.exports = Eval;

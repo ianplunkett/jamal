@@ -1,36 +1,69 @@
 'use strict';
 
-let Exception = require('./exception.js');
+let Exception = require('./exception.js'),
+    Type = require('./type.js');
 
 function addition() {
     return {
         name : '+',
-        type : 'arithmetic',
-        fn : (a,b) => a+b
+        type_signature : 'Integer...',
+        return_type    : 'Integer',
+        base_case      : new Type(0),
+        fn : (a,b) => {
+            let value = a+b,
+                typed_value = new Type(value);
+            return typed_value;
+        }
     };
 }
 
 function subtraction() {
     return {
         name : '-',
-        type : 'arithmetic',
-        fn : (a,b) => a-b
+        type_signature : 'Integer...',
+        return_type    : 'Integer',
+        base_case      : {value: undefined},
+        fn : (a,b) => {
+            if (typeof a === 'undefined') {
+                return new Type(b);
+            } else {
+                let value = a-b,
+                    typed_value = new Type(value);
+                return typed_value;
+            }
+        }
     };
 }
 
 function multiplication() {
     return {
         name : '*',
-        type : 'arithmetic',
-        fn : (a,b) => a*b
+        type_signature : 'Integer...',
+        return_type    : 'Integer',
+        base_case      : new Type(1),
+        fn : (a,b) => {
+            let value = a*b,
+                typed_value = new Type(value);
+            return typed_value;
+        }
     };
 }
 
 function division() {
     return {
         name : '/',
-        type : 'arithmetic',
-        fn : (a,b) => parseInt(a/b)
+        type_signature : 'Integer...',
+        return_type    : 'Integer',
+        base_case      : {value: undefined},
+        fn : (a,b) => {
+            if (typeof a === 'undefined') {
+                return new Type(b);
+            } else {
+                let value = parseInt(a/b),
+                    typed_value = new Type(value);
+                return typed_value;
+            }
+        }
     };
 }
 
