@@ -6,6 +6,12 @@ let Exception = require('./exception.js'),
 function Eval(ast, env) {
     this.ast = ast;
     this.env = env;
+    
+    this.special = {
+        'def!' : true,
+        'let*' : true
+    };
+    
     return this;
 }
 
@@ -18,26 +24,24 @@ Eval.prototype.eval_ast = function() {
         case 'hash-map':
             return this.process_hashmap();
         case 'symbol':
-            return this.env.get(this.ast.value);
+            return this.process_symbol();
         default:
             return this.ast;
     }
 };
 
+Eval.prototype.process_symbol = function() {
+    return this.env.get(this.ast.value);
+};
 
-Eval.prototype.process_special = function(symbol) {
-    if (symbol === 'def!') {
-        return this.process_def();
-    } else if (symbol === 'let*') {
-        return this.process_let();
-    } else if (symbol === 'do') {
-        return this.process_do();
-    } else if (symbol === 'if') {
-        return this.process_if();
-    } else if (symbol === 'fn*') {
-        return this.process_fn();
-    } else {
-        throw new Exception('unknown special symbol');
+Eval.prototype.process_special = function(type) {
+    switch(type)  {
+        case 'def!':
+            return this.process_def();
+        case 'let*':
+            return this.process_let();
+        default:
+            return this.ast;
     }
 };
 
@@ -100,26 +104,27 @@ Eval.prototype.process_let = function() {
 
 Eval.prototype.process_def = function() {
 
-    let first = this.ast.shift(),
-        rest = this.ast.shift();
+    let first = this.ast.value.shift(),
+        rest = this.ast.value.shift();
 
-    if (this.ast.length > 0) {
+    if (this.ast.value.length > 0) {
         throw new Exception('improper special form invocation:' + first);
     }
 
-    let data = {
-        type: 'def!',
-        value: new Eval(this.env, rest).eval_ast()
-    };
-    this.env.set(first, data);
-    return this.env.get(first).value;
+    this.env.set(first.value, new Eval(rest, this.env).eval_ast());
+    return this.env.get(first.value);
 };
 
 Eval.prototype.process_list = function() {
 
     let list = this.ast.value,
-        head = list.shift(),
-        symbol_env = new Eval(head, this.env).eval_ast(),
+        head = list.shift();
+
+    if (this.special[head.value] === true) {
+        return this.process_special(head.value);
+    }
+    
+    let symbol_env = new Eval(head, this.env).eval_ast(),
         result = symbol_env.base_case;
 
     for (head of list) {
@@ -128,6 +133,7 @@ Eval.prototype.process_list = function() {
     }
     
     return result;
+
 };
 
 
