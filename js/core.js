@@ -67,6 +67,7 @@ function division() {
     };
 }
 
+/*
 function def_() {
     return  {
         name : 'def!',
@@ -164,6 +165,7 @@ function is_less_than_or_equal() {
         type : 'equality'
     };
 }
+*/
 
 function Core(env) {
 
@@ -172,8 +174,8 @@ function Core(env) {
         '+' : addition(),
         '-' : subtraction(),
         '*' : multiplication(),
-        '/' : division(),
-        
+        '/' : division()
+/*        
         // Equality
         '='  : is_equal(),
         '>'  : is_greater_than(),
@@ -192,7 +194,7 @@ function Core(env) {
         'fn*'    : fn_(),
         'if'     : if_(),
         'let*'   : let_()
-
+*/
     };
 
     for (let specialForm in ns) {
