@@ -16,19 +16,6 @@ false
 ;=>7
 
 
-;; Testing read of symbols
-+
-;=>+
-abc
-;=>abc
-   abc   
-;=>abc
-abc5
-;=>abc5
-abc-def
-;=>abc-def
-
-
 ;; Testing read of strings
 "abc"
 ;=>"abc"
@@ -42,25 +29,6 @@ abc-def
 ;;;;=>"abc\ndef"
 ""
 ;=>""
-
-
-;; Testing read of lists
-(+ 1 2)
-;=>(+ 1 2)
-((3 4))
-;=>((3 4))
-(+ 1 (+ 2 3))
-;=>(+ 1 (+ 2 3))
-  ( +   1   (+   2 3   )   )  
-;=>(+ 1 (+ 2 3))
-(* 1 2)
-;=>(* 1 2)
-(** 1 2)
-;=>(** 1 2)
-
-;; Test commas as whitespace
-(1 2, 3,,,,),,
-;=>(1 2 3)
 
 ;; Testing read of quoting
 '1
@@ -94,18 +62,10 @@ abc-def
 ;; Testing keywords
 :kw
 ;=>:kw
-(:kw1 :kw2 :kw3)
-;=>(:kw1 :kw2 :kw3)
 
 ;; Testing read of vectors
-[+ 1 2]
-;=>[+ 1 2]
 [[3 4]]
 ;=>[[3 4]]
-[+ 1 [+ 2 3]]
-;=>[+ 1 [+ 2 3]]
-  [ +   1   [+   2 3   ]   ]  
-;=>[+ 1 [+ 2 3]]
 
 ;; Testing read of hash maps
 {"abc" 1}
