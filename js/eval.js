@@ -44,7 +44,7 @@ Eval.prototype.process_special = function(type) {
             return this.ast;
     }
 };
-
+/*
 Eval.prototype.process_fn = function() {
     let self = this;
     return function() {
@@ -83,23 +83,22 @@ Eval.prototype.process_if = function() {
     
 };
 
+*/
+
 Eval.prototype.process_let = function() {
     let env = new Env(this.env),
-        bindings = this.ast.shift();
+        bindings = this.ast.value.shift();
     
-    if (!Array.isArray(bindings) || bindings.length % 2 === 1) {
+    if (bindings.value.length % 2 === 1) {
         throw new Exception('poorly formatted binding list');
-    } else {
-        for (let i = 0; i < bindings.length; i += 2) {
-            let data = {
-                type: 'def!',
-                value: new Eval(env, bindings[i+1]).eval_ast()
-            };
-            
-            env.set(bindings[i], data);
-        }
     }
-    return new Eval(env, this.ast.shift()).eval_ast();
+
+    for (let i = 0; i < bindings.value.length; i += 2) {
+        env.set(bindings.value[i].value, new Eval(bindings.value[i+1], env).eval_ast());
+    }
+
+    let ret = new Eval(this.ast.value.shift(), env).eval_ast();
+    return ret;
 };
 
 Eval.prototype.process_def = function() {
