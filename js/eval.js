@@ -44,7 +44,7 @@ Eval.prototype.process_special = function(type) {
             return this.ast;
     }
 };
-/*
+
 Eval.prototype.process_fn = function() {
     let self = this;
     return function() {
@@ -82,8 +82,6 @@ Eval.prototype.process_if = function() {
     }
     
 };
-
-*/
 
 Eval.prototype.process_let = function() {
     let env = new Env(this.env),
@@ -124,11 +122,11 @@ Eval.prototype.process_list = function() {
     }
     
     let symbol_env = new Eval(head, this.env).eval_ast(),
-        result = symbol_env.base_case;
+        result = symbol_env.base_case();
 
     for (head of list) {
         let evaled_head = new Eval(head, this.env).eval_ast();
-        result = symbol_env.fn(result.value, evaled_head.value);
+        result = symbol_env.fn(result, evaled_head);
     }
     
     return result;

@@ -1,16 +1,18 @@
 'use strict';
 
 let Exception = require('./exception.js'),
-    Type = require('./type.js');
+    Reader    = require('./reader.js'),
+    Tokenizer = require('./tokenizer.js'),
+    Type      = require('./type.js');
 
 function addition() {
     return {
         name : '+',
         type_signature : 'Integer...',
         return_type    : 'Integer',
-        base_case      : new Type(0),
+        base_case      : () => new Type(0),
         fn : (a,b) => {
-            let value = a+b,
+            let value = a.value+b.value,
                 typed_value = new Type(value);
             return typed_value;
         }
@@ -22,12 +24,12 @@ function subtraction() {
         name : '-',
         type_signature : 'Integer...',
         return_type    : 'Integer',
-        base_case      : {value: undefined},
+        base_case      : () => ({value: undefined}),
         fn : (a,b) => {
-            if (typeof a === 'undefined') {
-                return new Type(b);
+            if (typeof a.value === 'undefined') {
+                return b;
             } else {
-                let value = a-b,
+                let value = a.value-b.value,
                     typed_value = new Type(value);
                 return typed_value;
             }
@@ -40,9 +42,9 @@ function multiplication() {
         name : '*',
         type_signature : 'Integer...',
         return_type    : 'Integer',
-        base_case      : new Type(1),
+        base_case      : () => new Type(1),
         fn : (a,b) => {
-            let value = a*b,
+            let value = a.value * b.value,
                 typed_value = new Type(value);
             return typed_value;
         }
@@ -54,12 +56,12 @@ function division() {
         name : '/',
         type_signature : 'Integer...',
         return_type    : 'Integer',
-        base_case      : {value: undefined},
+        base_case      : () => ({value: undefined}),
         fn : (a,b) => {
-            if (typeof a === 'undefined') {
-                return new Type(b);
+            if (typeof a.value === 'undefined') {
+                return b;
             } else {
-                let value = parseInt(a/b),
+                let value = parseInt(a.value/b.value),
                     typed_value = new Type(value);
                 return typed_value;
             }
@@ -67,34 +69,22 @@ function division() {
     };
 }
 
+
+function list() {
+    return {
+        name : 'list',
+        type_signature : 'List',
+        return_type    : 'List',
+        base_case      : () =>  new Reader(new Tokenizer('()')).read_str(),
+        fn : (a,b) => {
+            a.value.push(b);
+            return a;
+        }
+        
+    };
+}
+
 /*
-function def_() {
-    return  {
-        name : 'def!',
-        type : 'special'
-    };
-}
-
-function let_() {
-    return {
-        name : 'let*',
-        type : 'special'
-    };
-}
-
-function do_() {
-    return {
-        name : 'do',
-        type : 'special'
-    };
-}
-
-function if_() {
-    return {
-        name : 'if',
-        type : 'special'
-    };
-}
 
 function fn_() {
     return {
@@ -103,12 +93,6 @@ function fn_() {
     };
 }
 
-function list() {
-    return {
-        name : 'fn*',
-        type : 'special'
-    };
-}
 
 function is_list() {
     return {
@@ -174,7 +158,11 @@ function Core(env) {
         '+' : addition(),
         '-' : subtraction(),
         '*' : multiplication(),
-        '/' : division()
+        '/' : division(),
+
+        // List operations
+        'list'   : list()
+
 /*        
         // Equality
         '='  : is_equal(),
@@ -186,14 +174,7 @@ function Core(env) {
         // Generic Special Forms
         'count'  : count(),
         'empty?' : is_empty(),
-        'list'   : list(),
-        'list?'  : is_list(),
-
-        'def!'   : def_(),
-        'do'     : do_(),
-        'fn*'    : fn_(),
-        'if'     : if_(),
-        'let*'   : let_()
+        'list?'  : is_list()
 */
     };
 
