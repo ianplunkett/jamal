@@ -121,6 +121,10 @@
 ;=>true
 (= (list 1 2) (list 1 2))
 ;=>true
+(= (list 1 2 3) (list 1 2))
+;=>false
+(= (list 2 3) (list 1 2))
+;=>false
 (= (list 1) (list))
 ;=>false
 (= (list) (list 1))
