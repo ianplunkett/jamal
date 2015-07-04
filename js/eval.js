@@ -1,7 +1,8 @@
 'use strict';
 
 let Exception = require('./exception.js'),
-    Env = require('./env.js');
+    Env       = require('./env.js'),
+    Type      = require('./type.js');
 
 function Eval(ast, env) {
     this.ast = ast;
@@ -9,7 +10,8 @@ function Eval(ast, env) {
     
     this.special = {
         'def!' : true,
-        'let*' : true
+        'let*' : true,
+        'if'   : true
     };
     
     return this;
@@ -40,6 +42,8 @@ Eval.prototype.process_special = function(type) {
             return this.process_def();
         case 'let*':
             return this.process_let();
+        case 'if':
+            return this.process_if();
         default:
             return this.ast;
     }
@@ -66,19 +70,20 @@ Eval.prototype.process_do = function() {
 };
 
 Eval.prototype.process_if = function() {
-    let length = this.ast.length;
+    let length = this.ast.value.length;
     if (length < 2 || length > 3) {
         throw new Exception('improperly formatted if-then-else');
     }
 
-    let test = new Eval(this.env, this.ast.shift()).eval_ast();
-    if (test !== 'nil' && test !== 'false') {
-        return new Eval(this.env, this.ast.shift()).eval_ast();
+    let test = new Eval(this.ast.value.shift(), this.env).eval_ast();
+    if (test.value !== 'nil' && test.value !== 'false') {
+        return new Eval(this.ast.value.shift(), this.env).eval_ast();
     } else if (length === 2) {
-        return 'nil';
+        return new Type('nil');
     } else {
-        this.ast.shift();
-        return new Eval(this.env, this.ast.shift()).eval_ast();
+        // TODO - why do we throw this value on the floor?  
+        this.ast.value.shift();
+        return new Eval(this.ast.value.shift(), this.env).eval_ast();
     }
     
 };
