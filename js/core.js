@@ -153,25 +153,92 @@ function is_empty() {
     };
 }
 
-/*
-
-function fn_() {
-    return {
-        name : 'fn*',
-        type : 'special'
-    };
-}
-
-
-
 function count() {
     return {
         name : 'count',
-        type: 'special'
+        fn : (list, env) => {
+            let head = list.shift();
+            let evaled_head = new Eval(head, env).eval_ast();
+            if (evaled_head.type === 'list') {
+                return new Type(evaled_head.value.length);
+            } else {
+                return new Type(0);
+            }
+            
+        }
+    };
+}
+
+function is_greater_than() {
+    return {
+        name : '>',
+        fn : (list, env) => {
+            let left = new Eval(list.shift(), env).eval_ast();
+            let right = new Eval(list.shift(), env).eval_ast();
+            if (left.type !== 'integer' && right.type !== 'integer') {
+                throw Exception('Incorrect types for equality check');
+            } else if (left.value > right.value) {
+                return new Type('true');
+            } else {
+                return new Type('false');
+            }
+        }
+    };
+}
+
+function is_less_than() {
+    return {
+        name : '<',
+        fn : (list, env) => {
+            let left = new Eval(list.shift(), env).eval_ast();
+            let right = new Eval(list.shift(), env).eval_ast();
+            if (left.type !== 'integer' && right.type !== 'integer') {
+                throw Exception('Incorrect types for equality check');
+            } else if (left.value < right.value) {
+                return new Type('true');
+            } else {
+                return new Type('false');
+            }
+        }
+    };
+}
+
+function is_greater_than_or_equal() {
+    return {
+        name : '>=',
+        fn : (list, env) => {
+            let left = new Eval(list.shift(), env).eval_ast();
+            let right = new Eval(list.shift(), env).eval_ast();
+            if (left.type !== 'integer' && right.type !== 'integer') {
+                throw Exception('Incorrect types for equality check');
+            } else if (left.value >= right.value) {
+                return new Type('true');
+            } else {
+                return new Type('false');
+            }
+        }
     };
 }
 
 
+function is_less_than_or_equal() {
+    return {
+        name : '<=',
+        fn : (list, env) => {
+            let left = new Eval(list.shift(), env).eval_ast();
+            let right = new Eval(list.shift(), env).eval_ast();
+            if (left.type !== 'integer' && right.type !== 'integer') {
+                throw Exception('Incorrect types for equality check');
+            } else if (left.value <= right.value) {
+                return new Type('true');
+            } else {
+                return new Type('false');
+            }
+        }
+    };
+}
+
+/*
 function is_equal() {
     return {
         name : '=',
@@ -179,32 +246,7 @@ function is_equal() {
     };
 }
 
-function is_greater_than() {
-    return {
-        name : '>',
-        type : 'equality'
-    };
-}
 
-function is_greater_than_or_equal() {
-    return {
-        name : '>=',
-        type : 'equality'
-    };
-}
-
-function is_less_than() {
-    return {
-        name : '<',
-        type : 'equality'
-    };
-}
-
-function is_less_than_or_equal() {
-    return {
-        name : '<=',
-        type : 'equality'
-    };
 }
 */
 
@@ -220,18 +262,20 @@ function Core(env) {
         // List operations
         'list'   : list(),
         'list?'  : is_list(),
-        'empty?' : is_empty()
+        'empty?' : is_empty(),
+        'count'  : count(),
 
-/*        
         // Equality
-        '='  : is_equal(),
         '>'  : is_greater_than(),
         '>=' : is_greater_than_or_equal(),
         '<'  : is_less_than(),
-        '<=' : is_less_than_or_equal(),
-        
+        '<=' : is_less_than_or_equal()
+
+/*        
+        '='  : is_equal(),
+
         // Generic Special Forms
-        'count'  : count(),
+
 
 
 */
