@@ -1,6 +1,7 @@
 'use strict';
 
-let Exception = require('./exception.js'),
+let Eval      = require('./eval.js'),
+    Exception = require('./exception.js'),
     Reader    = require('./reader.js'),
     Tokenizer = require('./tokenizer.js'),
     Type      = require('./type.js');
@@ -8,13 +9,19 @@ let Exception = require('./exception.js'),
 function addition() {
     return {
         name : '+',
-        type_signature : 'Integer...',
-        return_type    : 'Integer',
-        base_case      : () => new Type(0),
-        fn : (a,b) => {
-            let value = a.value+b.value,
-                typed_value = new Type(value);
-            return typed_value;
+        fn : (list, env) => {
+            let product = 0;
+            if (list.length < 2) {
+                throw Exception('Two or more elements required for addition');
+            }
+            for (let head of list) {
+                let evaled_head = new Eval(head, env).eval_ast();
+                if (evaled_head.type !== 'integer') {
+                    throw Exception('Integer values required for addition');
+                }
+                product += evaled_head.value;
+            }
+            return new Type(product);
         }
     };
 }
@@ -22,17 +29,23 @@ function addition() {
 function subtraction() {
     return {
         name : '-',
-        type_signature : 'Integer...',
-        return_type    : 'Integer',
-        base_case      : () => ({value: undefined}),
-        fn : (a,b) => {
-            if (typeof a.value === 'undefined') {
-                return b;
-            } else {
-                let value = a.value-b.value,
-                    typed_value = new Type(value);
-                return typed_value;
+        fn : (list, env) => {
+            if (list.length < 2) {
+                throw Exception('Two or more elements required for addition');
             }
+            let product = undefined;
+            for (let head of list) {
+                let evaled_head = new Eval(head, env).eval_ast();
+                if (evaled_head.type !== 'integer') {
+                    throw Exception('Integer values required for addition');
+                }
+                if (product === undefined) {
+                    product = evaled_head.value;
+                } else {
+                    product -= evaled_head.value;
+                }
+            }
+            return new Type(product);
         }
     };
 }
@@ -40,13 +53,23 @@ function subtraction() {
 function multiplication() {
     return {
         name : '*',
-        type_signature : 'Integer...',
-        return_type    : 'Integer',
-        base_case      : () => new Type(1),
-        fn : (a,b) => {
-            let value = a.value * b.value,
-                typed_value = new Type(value);
-            return typed_value;
+        fn : (list, env) => {
+            if (list.length < 2) {
+                throw Exception('Two or more elements required for addition');
+            }
+            let product = undefined;
+            for (let head of list) {
+                let evaled_head = new Eval(head, env).eval_ast();
+                if (evaled_head.type !== 'integer') {
+                    throw Exception('Integer values required for addition');
+                }
+                if (product === undefined) {
+                    product = evaled_head.value;
+                } else {
+                    product *= evaled_head.value;
+                }
+            }
+            return new Type(product);
         }
     };
 }
@@ -57,14 +80,23 @@ function division() {
         type_signature : 'Integer...',
         return_type    : 'Integer',
         base_case      : () => ({value: undefined}),
-        fn : (a,b) => {
-            if (typeof a.value === 'undefined') {
-                return b;
-            } else {
-                let value = parseInt(a.value/b.value),
-                    typed_value = new Type(value);
-                return typed_value;
+        fn : (list, env) => {
+            if (list.length < 2) {
+                throw Exception('Two or more elements required for addition');
             }
+            let product = undefined;
+            for (let head of list) {
+                let evaled_head = new Eval(head, env).eval_ast();
+                if (evaled_head.type !== 'integer') {
+                    throw Exception('Integer values required for addition');
+                }
+                if (product === undefined) {
+                    product = evaled_head.value;
+                } else {
+                    product /= evaled_head.value;
+                }
+            }
+            return new Type(product);
         }
     };
 }
@@ -73,14 +105,51 @@ function division() {
 function list() {
     return {
         name : 'list',
-        type_signature : 'List',
-        return_type    : 'List',
-        base_case      : () =>  new Reader(new Tokenizer('()')).read_str(),
-        fn : (a,b) => {
-            a.value.push(b);
-            return a;
+        fn : (list, env) => {
+            let out_list = new Reader(new Tokenizer('()')).read_str();
+            if (list.count === 0) {
+                return out_list;
+            } else {
+                for (let head of list) {
+                    let evaled_head = new Eval(head, env).eval_ast();
+                    out_list.value.push(evaled_head);
+                }
+                return out_list;
+            }
+
         }
         
+    };
+}
+
+function is_list() {
+    return {
+        name : 'list',
+        fn : (list, env) => {
+            let head = list.shift();
+            let evaled_head = new Eval(head, env).eval_ast();
+            if (evaled_head.type === 'list') {
+                return new Type('true');
+            } else {
+                return new Type('false');;
+            }
+        }
+    };
+}
+
+function is_empty() {
+    return {
+        name : 'empty?',
+        fn : (list, env) => {
+            let head = list.shift();
+            let evaled_head = new Eval(head, env).eval_ast();
+            if (evaled_head.type === 'list' && evaled_head.value.length === 0) {
+                return new Type('true');
+            } else {
+                return new Type('false');;
+            }
+            
+        }
     };
 }
 
@@ -94,12 +163,6 @@ function fn_() {
 }
 
 
-function is_list() {
-    return {
-        name : 'list',
-        type : 'special'
-    };
-}
 
 function count() {
     return {
@@ -108,12 +171,6 @@ function count() {
     };
 }
 
-function is_empty() {
-    return {
-        name : 'empty?',
-        type : 'special'
-    };
-}
 
 function is_equal() {
     return {
@@ -161,7 +218,9 @@ function Core(env) {
         '/' : division(),
 
         // List operations
-        'list'   : list()
+        'list'   : list(),
+        'list?'  : is_list(),
+        'empty?' : is_empty()
 
 /*        
         // Equality
@@ -173,8 +232,8 @@ function Core(env) {
         
         // Generic Special Forms
         'count'  : count(),
-        'empty?' : is_empty(),
-        'list?'  : is_list()
+
+
 */
     };
 

@@ -121,15 +121,8 @@ Eval.prototype.process_list = function() {
         return this.process_special(head.value);
     }
     
-    let symbol_env = new Eval(head, this.env).eval_ast(),
-        result = symbol_env.base_case();
-
-    for (head of list) {
-        let evaled_head = new Eval(head, this.env).eval_ast();
-        result = symbol_env.fn(result, evaled_head);
-    }
-    
-    return result;
+    let symbol_env = new Eval(head, this.env).eval_ast();
+    return symbol_env.fn(list, this.env);
 
 };
 
