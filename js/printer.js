@@ -43,6 +43,8 @@ Printer.prototype.build_str = function(ast, is_child) {
             return output.concat(ast.end);
         case 'atom':
             return output.concat(ast.value);
+        case 'closure':
+            return '#<function>';
     }
 
     return output;

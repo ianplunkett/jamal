@@ -25,6 +25,7 @@ function main() {
     rl.setPrompt('user> ');
     rl.prompt();
 
+    rep(env, '(def! not (fn* (a) (if a false true)))');
     rl.on('line', function(line) {
         try {
             console.log(rep(env, line));

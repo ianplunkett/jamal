@@ -1,17 +1,19 @@
 'use strict';
 let Exception = require('./exception.js');
-
+    
 function Env(outer, binds, exprs) {
+    this.outer = outer;
+    this.data = {};
     let self = this;
+
+
     if (typeof binds === 'object' && binds.length > 0) {
         binds.map(
             function(currentValue, index, array) {
-                self.set(currentValue, exprs[index]);
+                self.set(currentValue.value, exprs[index]);
             }
         );
     }
-    this.outer = outer;
-    this.data = {};
     return this;
 }
 

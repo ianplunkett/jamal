@@ -11,7 +11,8 @@ function Eval(ast, env) {
     this.special = {
         'def!' : true,
         'let*' : true,
-        'if'   : true
+        'if'   : true,
+        'fn*'  : true
     };
     
     return this;
@@ -44,19 +45,31 @@ Eval.prototype.process_special = function(type) {
             return this.process_let();
         case 'if':
             return this.process_if();
+        case 'fn*':
+            return this.process_fn();
         default:
             return this.ast;
     }
 };
 
 Eval.prototype.process_fn = function() {
-    let self = this;
-    return function() {
-        let binds = this.ast.shift();
-        let exprs = this.ast.shift();
-        this.env = new Env(self.env, binds, exprs);
-        return new Eval(this.ast.shift(), this.env).eval_ast();
-    };
+    let self           = this,
+        binds          = self.ast.value.shift(),
+        ast            = self.ast.value.shift(),
+        serialized_ast = JSON.stringify(ast);
+    
+    return {
+        form : 'closure',
+        fn   : function(exprs, env) {
+            let evaled_exprs = [];
+            for (let expr of exprs) {
+                let evaled_expr = new Eval(expr, env).eval_ast();
+                evaled_exprs.push(evaled_expr);
+            }
+            this.env = new Env(self.env, binds.value, evaled_exprs);
+            let inner_ast = JSON.parse(serialized_ast);
+            return new Eval(inner_ast, this.env).eval_ast();
+        }};
 };
 
 Eval.prototype.process_do = function() {
