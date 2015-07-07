@@ -1,19 +1,37 @@
 'use strict';
-let Exception = require('./exception.js');
+let Exception = require('./exception.js'),
+    Type = require('./type.js');;
     
 function Env(outer, binds, exprs) {
     this.outer = outer;
     this.data = {};
     let self = this;
 
-
     if (typeof binds === 'object' && binds.length > 0) {
+        for (let i = 0; i < binds.length; + i++) {
+            if (binds[i].value === '&') {
+                // TODO - we should not be constructing this object
+                // here. should be called externally.
+                let exprs_list = {
+                    type: 'list',
+                    form: 'list',
+                    value: exprs.slice(i)
+                };
+                self.set(binds[i + 1].value, exprs_list);
+                break;
+            }
+            self.set(binds[i].value, exprs[i]);
+        }
+    }
+    /*
+  
         binds.map(
             function(currentValue, index, array) {
                 self.set(currentValue.value, exprs[index]);
             }
         );
-    }
+
+*/
     return this;
 }
 

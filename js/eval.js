@@ -12,7 +12,8 @@ function Eval(ast, env) {
         'def!' : true,
         'let*' : true,
         'if'   : true,
-        'fn*'  : true
+        'fn*'  : true,
+        'do'   : true
     };
     
     return this;
@@ -47,6 +48,8 @@ Eval.prototype.process_special = function(type) {
             return this.process_if();
         case 'fn*':
             return this.process_fn();
+        case 'do':
+            return this.process_do();
         default:
             return this.ast;
     }
@@ -73,11 +76,11 @@ Eval.prototype.process_fn = function() {
 };
 
 Eval.prototype.process_do = function() {
-    let length = this.ast.length,
+    let length = this.ast.value.length,
         last;
     
     for(let i = 0; i < length; i++) {
-        last = new Eval(this.env, this.ast.shift()).eval_ast();
+        last = new Eval(this.ast.value.shift(), this.env).eval_ast();
     }
     return last;
 };
