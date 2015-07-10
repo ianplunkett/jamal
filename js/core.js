@@ -2,6 +2,7 @@
 
 let Eval      = require('./eval.js'),
     Exception = require('./exception.js'),
+    Printer   = require('./printer.js'),
     Reader    = require('./reader.js'),
     Tokenizer = require('./tokenizer.js'),
     Type      = require('./type.js');
@@ -284,6 +285,83 @@ function is_equal() {
     };
 }
 
+function pr_str() {
+    return {
+        name : 'pr-str',
+        fn : (list, env) => {
+            let out = '';
+            for (let item of list) {
+                item = new Eval(item, env).eval_ast();
+//                item.value = item.value.toString().replace(/\\/g, '\\\\');
+//                item.value = item.value.toString().replace(/"/g, '\\"');
+
+                let string = new Printer(item).pr_str(true);
+                if (out === '') {
+                    out = string;
+                } else {
+                    out = out + ' ' +string;
+                }
+                
+            }
+            return new Type('"'+out+'"');
+            /*
+            let out = '';
+            if (list.length === 0) {
+                return new Type(new Printer(new Type("\"\"")).pr_str(true));
+            }
+             for (let item of list) {
+                item = new Eval(item, env).eval_ast();
+                if (item.type === 'list') {
+                    out = pr_str().fn(item.value, env).value;
+                } else {
+                    item.value = item.value.toString().replace(/\\/g, '\\\\');
+                    item.value = item.value.toString().replace(/"/g, '\\"');
+                    let string  = new Printer(item).pr_str(true);
+                    if (out === '') {
+                        out = string;
+                    } else {
+                        out = out + ' ' +string;
+                    }
+                }
+            }
+            return new Type('"'+out+'"');
+             */
+        }
+    };
+}
+
+function str() {
+    return {
+        name : 'str',
+        fn : (list, env) => {
+        }
+    };
+}
+
+function prn() {
+    return {
+        name : 'prn',
+        fn : (list, env) => {
+            let out = '';
+            for (let item of list) {
+                let string = new Printer(item).pr_str(true);
+                out += string;
+            }
+            console.log(out);
+            return new Type("nil");
+        }
+    };
+}
+
+function println() {
+    return {
+        name : 'println',
+        fn : (list, env) => {
+        }
+    };
+}
+
+
 function Core(env) {
 
     let ns = {
@@ -304,7 +382,13 @@ function Core(env) {
         '>=' : is_greater_than_or_equal(),
         '<'  : is_less_than(),
         '<=' : is_less_than_or_equal(),
-        '='  : is_equal()
+        '='  : is_equal(),
+
+        // Strings
+        'pr-str'  : pr_str(),
+        'str'     : str(),
+        'prn'     : prn(),
+        'println' : println()
     };
 
     for (let specialForm in ns) {

@@ -12,7 +12,10 @@ function atom(token) {
             regex:  /^true|false$/
         }, {
             type  : 'string',
-            regex : /^".*"$/
+            regex : /^".*"$/,
+            transform : string => {
+                return string;
+            }
         }, {
             type  : 'integer',
             regex : /^\d+$/,

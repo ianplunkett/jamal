@@ -86,6 +86,7 @@ Reader.prototype.atom = function(typed_token) {
     // Increment to the next token, but throw it on the ground. We
     // already have the typed token.
     this.next();
+//    typed_token = typed_token.value.replace(/"/,'\"');
     return typed_token;
 
 };
