@@ -60,6 +60,7 @@ Printer.prototype.build_atom_form = function(ast) {
 Printer.prototype.strip_string = function(ast) {
     ast.value = ast.value.toString().replace(/^"/, '');
     ast.value = ast.value.toString().replace(/"$/, '');
+    
     ast.formatted = true;
     return ast;
 };

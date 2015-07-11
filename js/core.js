@@ -321,7 +321,6 @@ function str() {
                     out = out + string;
                 }
                 let new_string = new Type('"'+out+'"');
-                new_string.formatted = true;
                 return new_string;
             }
         }
@@ -334,8 +333,13 @@ function prn() {
         fn : (list, env) => {
             let out = '';
             for (let item of list) {
-                let string = new Printer(item).pr_str(true);
-                out += string;
+                item = new Eval(item, env).eval_ast();
+                let string = new Printer(item).pr_str();
+                if (out === '') {
+                    out = string;
+                } else {
+                    out = out + ' ' +string;
+                }
             }
             console.log(out);
             return new Type("nil");
@@ -347,6 +351,19 @@ function println() {
     return {
         name : 'println',
         fn : (list, env) => {
+            let out = '';
+            for (let item of list) {
+                item = new Eval(item, env).eval_ast();
+                let string = new Printer(item, false).pr_str();
+                if (out === '') {
+                    out = string;
+                } else {
+                    out = out + ' ' +string;
+                }
+            }
+            out = out.toString().replace(/\\"/, '"');
+            console.log(out);
+            return new Type("nil");
         }
     };
 }
