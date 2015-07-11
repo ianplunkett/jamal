@@ -251,10 +251,15 @@ function is_equal() {
             // TODO flatten out this logic.  This function is pretty convoluted.
             if (left.type === 'list' && left.value.length > 0 && env.data.hasOwnProperty(left.value[0].value)) {
                 left = new Eval(left, env).eval_ast();
-            } 
+            } else if (left.type === 'vector') {
+                left = new Eval(left, env).eval_ast();
+            }
+
             if (right.type === 'list' && right.value.length > 0 && env.data.hasOwnProperty(right.value[0].value)) {
                 right = new Eval(right, env).eval_ast();
-            } 
+            } else if (right.type === 'vector') {
+                right = new Eval(right, env).eval_ast();
+            }
 
             if (left.type === 'symbol') {
                 left = env.get(left.value);
@@ -270,13 +275,11 @@ function is_equal() {
                 return new Type('true');
             } else if (left.form === 'list'
                        && left.form === right.form
-                       && left.type === right.type
                        && left.value.length === right.value.length
                        && left.value.length === 0) {
                 return new Type('true');
             } else if (left.form === 'list'
                        && left.form === right.form
-                       && left.type === right.type
                        && left.value.length === right.value.length) {
                 
                 let head_equality = is_equal().fn([left.value.shift(), right.value.shift()], env);
