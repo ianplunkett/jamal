@@ -32,13 +32,13 @@ function subtraction() {
         name : '-',
         fn : (list, env) => {
             if (list.length < 2) {
-                throw Exception('Two or more elements required for addition');
+                throw Exception('Two or more elements required for subtraction');
             }
             let product = undefined;
             for (let head of list) {
                 let evaled_head = new Eval(head, env).eval_ast();
                 if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for addition');
+                    throw Exception('Integer values required for subtraction');
                 }
                 if (product === undefined) {
                     product = evaled_head.value;
@@ -56,13 +56,13 @@ function multiplication() {
         name : '*',
         fn : (list, env) => {
             if (list.length < 2) {
-                throw Exception('Two or more elements required for addition');
+                throw Exception('Two or more elements required for multiplication');
             }
             let product = undefined;
             for (let head of list) {
                 let evaled_head = new Eval(head, env).eval_ast();
                 if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for addition');
+                    throw Exception('Integer values required for multiplication');
                 }
                 if (product === undefined) {
                     product = evaled_head.value;
@@ -83,13 +83,13 @@ function division() {
         base_case      : () => ({value: undefined}),
         fn : (list, env) => {
             if (list.length < 2) {
-                throw Exception('Two or more elements required for addition');
+                throw Exception('Two or more elements required for division');
             }
             let product = undefined;
             for (let head of list) {
                 let evaled_head = new Eval(head, env).eval_ast();
                 if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for addition');
+                    throw Exception('Integer values required for division');
                 }
                 if (product === undefined) {
                     product = evaled_head.value;
