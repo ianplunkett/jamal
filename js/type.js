@@ -18,7 +18,7 @@ function atom(token) {
             }
         }, {
             type  : 'integer',
-            regex : /^\d+$/,
+            regex : /^-?\d+$/,
             transform : integer => parseInt(integer)
         }, {
             type  : 'keyword',

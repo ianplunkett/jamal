@@ -256,6 +256,13 @@ function is_equal() {
                 right = new Eval(right, env).eval_ast();
             } 
 
+            if (left.type === 'symbol') {
+                left = env.get(left.value);
+            }
+            if (right.type === 'symbol') {
+                right = env.get(right.value);
+            }
+
             if (left.form === 'atom'
                 && left.form === right.form
                 && left.type === right.type
