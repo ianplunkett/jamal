@@ -292,40 +292,16 @@ function pr_str() {
             let out = '';
             for (let item of list) {
                 item = new Eval(item, env).eval_ast();
-//                item.value = item.value.toString().replace(/\\/g, '\\\\');
-//                item.value = item.value.toString().replace(/"/g, '\\"');
-
-                let string = new Printer(item).pr_str(true);
+                let string = new Printer(item, true).pr_str();
                 if (out === '') {
                     out = string;
                 } else {
                     out = out + ' ' +string;
                 }
-                
             }
-            return new Type('"'+out+'"');
-            /*
-            let out = '';
-            if (list.length === 0) {
-                return new Type(new Printer(new Type("\"\"")).pr_str(true));
-            }
-             for (let item of list) {
-                item = new Eval(item, env).eval_ast();
-                if (item.type === 'list') {
-                    out = pr_str().fn(item.value, env).value;
-                } else {
-                    item.value = item.value.toString().replace(/\\/g, '\\\\');
-                    item.value = item.value.toString().replace(/"/g, '\\"');
-                    let string  = new Printer(item).pr_str(true);
-                    if (out === '') {
-                        out = string;
-                    } else {
-                        out = out + ' ' +string;
-                    }
-                }
-            }
-            return new Type('"'+out+'"');
-             */
+            let new_string = new Type('"'+out+'"');
+            new_string.formatted = true;
+            return new_string;
         }
     };
 }

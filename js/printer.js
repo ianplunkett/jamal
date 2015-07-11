@@ -22,9 +22,9 @@ Printer.prototype.build_list_form = function(ast, is_child) {
                 output = output.concat(this.build_str(child, true));
             }
         } else if (ast.value.length - 1 === ast.value.indexOf(child)) {
-            output = output.concat(child.value);
+            output = output.concat(this.build_atom_form(child));
         } else {
-            output = output.concat(child.value)+" ";
+            output = output.concat(this.build_atom_form(child))+" ";
         }
     }
     if (is_child) {
