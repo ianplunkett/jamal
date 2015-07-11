@@ -310,6 +310,20 @@ function str() {
     return {
         name : 'str',
         fn : (list, env) => {
+            if (list.length === 0) {
+                return new Type('""');
+            } else {
+                
+                let out = '';
+                for (let item of list) {
+                    item = new Eval(item, env).eval_ast();
+                    let string = new Printer(item, false).pr_str();
+                    out = out + string;
+                }
+                let new_string = new Type('"'+out+'"');
+                new_string.formatted = true;
+                return new_string;
+            }
         }
     };
 }

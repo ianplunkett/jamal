@@ -51,9 +51,18 @@ Printer.prototype.build_atom_form = function(ast) {
     let output = '';
     if (ast.type === 'string' && !ast.hasOwnProperty('formatted') && this.print_readably === true) {
         ast = this.format_string(ast);
+    } else if (ast.type === 'string' && !ast.hasOwnProperty('formatted') && this.print_readably === false) {
+        ast = this.strip_string(ast);
     }
     return output.concat(ast.value);
-}
+};
+
+Printer.prototype.strip_string = function(ast) {
+    ast.value = ast.value.toString().replace(/^"/, '');
+    ast.value = ast.value.toString().replace(/"$/, '');
+    ast.formatted = true;
+    return ast;
+};
 
 Printer.prototype.format_string = function(ast) {
     ast.value = ast.value.toString().replace(/\\/g, '\\\\');
