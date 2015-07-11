@@ -144,7 +144,7 @@ function is_empty() {
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
-            if (evaled_head.type === 'list' && evaled_head.value.length === 0) {
+            if (evaled_head.form === 'list' && evaled_head.value.length === 0) {
                 return new Type('true');
             } else {
                 return new Type('false');;
@@ -160,7 +160,7 @@ function count() {
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
-            if (evaled_head.type === 'list') {
+            if (evaled_head.form === 'list') {
                 return new Type(evaled_head.value.length);
             } else {
                 return new Type(0);
