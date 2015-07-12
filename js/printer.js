@@ -76,7 +76,7 @@ Printer.prototype.build_str = function(ast, is_child) {
 
     switch (ast.form) {
         case 'list':
-            return this.build_list_form(ast);
+            return this.build_list_form(ast, is_child);
         case 'pair':
             return this.build_pair_form(ast);
         case 'atom':
