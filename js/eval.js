@@ -84,100 +84,44 @@ function Eval(ast, env) {
         }
     };
 
-    const eval_ast = (ast) => {
-        switch (ast.type) {
-            case 'list':
-                return this.process_list();
-            case 'vector':
-                return this.process_vector();
-            case 'hash-map':
-                return this.process_hashmap();
-            case 'symbol':
-                return this.process_symbol();
-            default:
-                return this.ast;
+    const eval_ast = {
+        'list'     : () => {
+
+            let list = this.ast.value,
+                head = list.shift();
+
+            if (this.special[head.value] === true) {
+                return this.process_special(head.value);
+            }
+            
+            let symbol_env = new Eval(head, this.env).eval_ast();
+            return symbol_env.fn(list, this.env);
+        },
+        'vector'   : () => {
+            let list = this.ast.value,
+                processed_list = [];
+            for (let item of list) {
+                let evaled_item = new Eval(item, this.env).eval_ast();
+                processed_list.push(evaled_item);
+            }
+            this.ast.value = processed_list;
+            return this.ast;
+        },
+        'hash-map' : () => {
+            let key = this.ast.value.shift(),
+                value = this.ast.value.shift();
+            if (this.ast.value.length > 0 || (key.type !== 'string' && key.type !== 'keyword')) {
+                throw Exception("Invalid hash-map!");
+            } 
+            let evaled_value = new Eval(value, this.env).eval_ast();
+            this.ast.value = [key, evaled_value];
+            return this.ast;
+        },
+        'symbol'   : () => {
+            return this.env.get(this.ast.value);
         }
     };
 }
-
-Eval.prototype.apply = () => {
-
-};
-
-function eval_ast() {
-    switch (this.ast.type) {
-        case 'list':
-            return this.process_list();
-        case 'vector':
-            return this.process_vector();
-        case 'hash-map':
-            return this.process_hashmap();
-        case 'symbol':
-            return this.process_symbol();
-        default:
-            return this.ast;
-    }
-};
-
-Eval.prototype.process_symbol = function() {
-    return this.env.get(this.ast.value);
-};
-
-Eval.prototype.process_fn = function() {
-    let self           = this,
-        binds          = self.ast.value.shift(),
-        ast            = self.ast.value.shift(),
-        serialized_ast = JSON.stringify(ast);
-    
-    return {
-        form : 'closure',
-        fn   : function(exprs, env) {
-            let evaled_exprs = [];
-            for (let expr of exprs) {
-                let evaled_expr = new Eval(expr, env).eval_ast();
-                evaled_exprs.push(evaled_expr);
-            }
-            this.env = new Env(self.env, binds.value, evaled_exprs);
-            let inner_ast = JSON.parse(serialized_ast);
-            return new Eval(inner_ast, this.env).eval_ast();
-        }};
-};
-
-Eval.prototype.process_list = function() {
-
-    let list = this.ast.value,
-        head = list.shift();
-
-    if (this.special[head.value] === true) {
-        return this.process_special(head.value);
-    }
-    
-    let symbol_env = new Eval(head, this.env).eval_ast();
-    return symbol_env.fn(list, this.env);
-
-};
-
-Eval.prototype.process_vector = function() {
-    let list = this.ast.value,
-        processed_list = [];
-    for (let item of list) {
-        let evaled_item = new Eval(item, this.env).eval_ast();
-        processed_list.push(evaled_item);
-    }
-    this.ast.value = processed_list;
-    return this.ast;
-};
-
-Eval.prototype.process_hashmap = function() {
-    let key = this.ast.value.shift(),
-        value = this.ast.value.shift();
-    if (this.ast.value.length > 0 || (key.type !== 'string' && key.type !== 'keyword')) {
-        throw Exception("Invalid hash-map!");
-    } 
-    let evaled_value = new Eval(value, this.env).eval_ast();
-    this.ast.value = [key, evaled_value];
-    return this.ast;
-};
 
 module.exports = Eval;
 
