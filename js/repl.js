@@ -10,7 +10,7 @@ let Core      = require('./core.js'),
 
 function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }
 
-function EVAL(env, ast) { return new Eval(ast, env).eval_ast(); }
+function EVAL(env, ast) { return new Eval(ast, env); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 

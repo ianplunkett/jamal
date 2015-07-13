@@ -410,7 +410,7 @@ function Core(env) {
 
     for (let specialForm in ns) {
         if (ns.hasOwnProperty(specialForm)) {
-            env.set(specialForm, ns[specialForm]);
+            env.set(specialForm, ns[specialForm].fn);
         }
     }
 
