@@ -10,27 +10,23 @@ let Eval      = require('./eval.js'),
 function addition() {
     return {
         name : '+',
-        fn : (list, env) => {
+        fn : (list, env, call_stack) => {
             let product = 0;
             if (list.length < 2) {
                 throw Exception('Two or more elements required for addition');
             }
             for (let head of list) {
                 if (head.type === 'integer') {
-                    
+                    product += head.value;
                 } else if (head.type === 'symbol') {
                     head.value = env.get(head.value);
                 } else if (head.type === 'list') {
-                    
+                    product = new Type(product);
+                    call_stack.push(new Type('+'), product);
+                    break;
                 }
-                /*
-                let evaled_head = new Eval(head, env).eval_ast();
-                if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for addition');
-                }
-                 */
-                product += evaled_head.value;
             }
+            
             return new Type(product);
         }
     };

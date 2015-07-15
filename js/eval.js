@@ -27,7 +27,7 @@ function Eval(ast, env) {
                 if (body.form !== 'atom') {
                     call_stack.push(head, symbol);
                 } else {
-                    env.set(symbol.value, body);
+                    call_stack = env.set(symbol.value, body, call_stack);
                 }
 
                 return body;
@@ -104,7 +104,7 @@ function Eval(ast, env) {
         if (special.hasOwnProperty(head.value)) {
             return special[head.value](rest);
         } else {
-            return env.get(head.value)(rest.value, env);
+            return env.get(head.value)(rest.value, env, call_stack);
         }
 
     };
