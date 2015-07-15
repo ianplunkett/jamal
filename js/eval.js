@@ -6,18 +6,31 @@ const Env       = require('./env.js'),
 
 function Eval(ast, env) {
 
-    const apply = (ast, env) => {
+    let call_stack = [];
+    
+    const apply = () => {
 
         const special = {
-            'def!' : () => { /**
-                              let first = ast.value.shift(),
-                              rest = ast.value.shift();
-                              if (ast.value.length > 0) {
-                              throw new Exception('improper special form invocation:' + first);
-                              }
 
-                              env.set(first.value, new Eval(rest, env).eval_ast());
-                              return env.get(first.value);*/
+            'def!' : (rest) => {
+                
+                if (rest.type !== 'list') {
+                    throw new Exception('def! must be applied to a list');
+                }
+
+                const symbol = rest.value.shift();
+                if (symbol.type !== 'symbol' && symbol.type !== 'keyword') {
+                    throw new Exception('def! must be applied to symbol or keyword');
+                }
+
+                const body = rest.value.shift();
+                if (body.form !== 'atom') {
+                    call_stack.push(head, symbol);
+                } else {
+                    env.set(symbol.value, body);
+                }
+
+                return body;
             },
             'do'   : () => {/**
                              let length = ast.value.length,
@@ -84,25 +97,24 @@ function Eval(ast, env) {
             }
         };
 
-	const head = ast.shift();
 
-	let result = {};
-	if (special.hasOwnProperty(head.value)) {
-	    result = special[head.value](ast, env);
-	} else {
-	    result =  env.get(head.value)(ast, env);
-	}
-	
+        const head = ast.shift(),
+              rest = ast.shift();
+
+        if (special.hasOwnProperty(head.value)) {
+            return special[head.value](rest);
+        } else {
+            return env.get(head.value)(rest.value, env);
+        }
 
     };
 
     const eval_ast = {
 
-        'list'     : (ast) => {
-	    const head = ast.value.shift();
-            return [head, ast.value];
+        'list'     : () => {
+            const head = ast.value.shift();
+            return [head, ast];
         },
-
         'vector'   : () => {
             let list = this.ast.value,
                 processed_list = [];
@@ -128,11 +140,28 @@ function Eval(ast, env) {
         }
     };
 
-    while(true) {
-        ast = apply(eval_ast[ast.type](ast), env);
-        break;
+    const build_ast = (ast) => {
+        if (call_stack.length === 0) {
+            return ast;
+        } else if (ast.form === 'atom') {
+            return ast;
+        } else {
+            return ast;
+        }
+    };
+
+    while(ast) {
+        ast = build_ast(ast);
+        ast = eval_ast[ast.type]();
+        ast = apply();
+
+        if (ast.form === 'atom') {
+            break;
+        }
     }
+    return ast;
 }
+
 
 module.exports = Eval;
 

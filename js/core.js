@@ -16,10 +16,19 @@ function addition() {
                 throw Exception('Two or more elements required for addition');
             }
             for (let head of list) {
+                if (head.type === 'integer') {
+                    
+                } else if (head.type === 'symbol') {
+                    head.value = env.get(head.value);
+                } else if (head.type === 'list') {
+                    
+                }
+                /*
                 let evaled_head = new Eval(head, env).eval_ast();
                 if (evaled_head.type !== 'integer') {
                     throw Exception('Integer values required for addition');
                 }
+                 */
                 product += evaled_head.value;
             }
             return new Type(product);
