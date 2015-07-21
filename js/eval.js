@@ -25,9 +25,9 @@ function Eval(ast, env) {
 
                 const body = rest.value.shift();
                 if (body.form !== 'atom') {
-                    call_stack.push(head, symbol);
+                    call_stack.push([head, symbol]);
                 } else {
-                    call_stack = env.set(symbol.value, body, call_stack);
+                    env.set(symbol.value, body);
                 }
 
                 return body;
@@ -135,7 +135,7 @@ function Eval(ast, env) {
             this.ast.value = [key, evaled_value];
             return this.ast;
         },
-        'symbol'   : (ast, env) => {
+        'symbol'   : () => {
             return env.get(ast.value);
         }
     };
@@ -144,7 +144,15 @@ function Eval(ast, env) {
         if (call_stack.length === 0) {
             return ast;
         } else if (ast.form === 'atom') {
-            return ast;
+            let current_call = call_stack.pop();
+            current_call.push(ast);
+
+            let list_object = {
+                form : 'list',
+                type : 'list',
+                value : current_call
+            };
+            return list_object;
         } else {
             return ast;
         }
@@ -152,10 +160,13 @@ function Eval(ast, env) {
 
     while(ast) {
         ast = build_ast(ast);
-        ast = eval_ast[ast.type]();
-        ast = apply();
-
-        if (ast.form === 'atom') {
+        if (ast.form === 'list') {
+            ast = eval_ast[ast.type]();
+            ast = apply();
+        } else if (ast.type === 'symbol') {
+            ast = eval_ast[ast.type]();
+            break;
+        } else {
             break;
         }
     }

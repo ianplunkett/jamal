@@ -15,19 +15,31 @@ function addition() {
             if (list.length < 2) {
                 throw Exception('Two or more elements required for addition');
             }
-            for (let head of list) {
+
+            while (list.length > 0) {
+                let head = list.shift();
                 if (head.type === 'integer') {
                     product += head.value;
                 } else if (head.type === 'symbol') {
                     head.value = env.get(head.value);
                 } else if (head.type === 'list') {
                     product = new Type(product);
-                    call_stack.push(new Type('+'), product);
+                    list.unshift(head);
+                    call_stack.push([new Type('+'), product]);
                     break;
                 }
             }
-            
-            return new Type(product);
+
+            if (list.length > 0) {
+                let list_object = {
+                    form : 'list',
+                    type : 'list',
+                    value : list
+                };
+                return list_object;
+            } else {
+                return new Type(product);
+            }
         }
     };
 }
