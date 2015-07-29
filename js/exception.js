@@ -1,6 +1,6 @@
 'use strict';
 function Exception(msg) {
-    console.log(msg);
+    console.error(msg);
 }
 
 module.exports = Exception;

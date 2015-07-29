@@ -4,34 +4,113 @@ const Env       = require('./env.js'),
       Exception = require('./exception.js'),
       Type      = require('./type.js');
 
+
+const build_ast = (ast, call_stack) => {
+
+    if (call_stack.length === 0) {
+        return {
+            ast : ast,
+            call_stack : []
+        };
+    } else if (ast.form === 'atom') {
+        let current_call = call_stack.pop();
+        current_call.push(ast);
+        return {
+            ast: {
+                form : 'list',
+                type : 'list',
+                value : current_call
+            },
+            call_stack: call_stack
+        };
+    } else {
+        // TODO - this is not complete
+        return ast;
+    }
+};
+
+const apply = (evaled_ast) => {
+
+    const operation = evaled_ast.ast.shift(),
+          list = evaled_ast.shift();
+
+    let env = evaled_ast.env,
+        call_stack = evaled_ast.call_stack;
+
+    const special =  {
+
+        'def!' : (rest) => {
+            
+            if (rest.type !== 'list') {
+                throw new Exception('def! must be applied to a list');
+            }
+
+            const symbol = rest.value.shift();
+            if (symbol.type !== 'symbol' && symbol.type !== 'keyword') {
+                throw new Exception('def! must be applied to symbol or keyword');
+            }
+
+            const body = rest.value.shift();
+            if (body.form !== 'atom') {
+                call_stack.push([head, symbol]);
+            } else if (body.type === 'symbol') {
+                env.set(symbol.value,env.get(body.value));
+            } else {
+                env.set(symbol.value, body);
+            }
+            return body;
+        }
+    };
+
+    if (special.hasOwnProperty(operation.value)) {
+        return special[operation.value](list);
+    } else {
+        return operation(list.value, env, call_stack);
+    }
+
+};
+
 function Eval(ast, env) {
 
     let call_stack = [];
     
-    const apply = () => {
+    while(true) {
 
-        const special = {
+        const ast_call_stack = build_ast(ast, call_stack);
+        ast = ast_call_stack.ast;
+        call_stack = ast_call_stack.call_stack;
+        
+        if (ast.type !== 'list') {
+            let evaled_ast = eval_ast(ast, env, call_stack);
+            if (evaled_ast.call_stack.length === 0) {
+                ast = evaled_ast.ast;
+                break;
+            }
+            
+        } else if (ast.type === 'list') {
+            let evaled_ast = eval_ast(ast, env, call_stack);
+            if (evaled_ast.call_stack.length === 0) {
+                ast = apply(evaled_ast);
+                ast = evaled_ast.ast;
+                break;
+            } else {
+                call_stack = evaled_ast.call_stack;
+                env = evaled_ast.env;
+                ast = evaled_ast.ast;
+            }
+        } else if (ast.type === 'list_elements') {
+            let evaled_ast = eval_ast(ast.value.shift(), env, call_stack);
+            call_stack = evaled_ast.call_stack;
+            env = eval_ast.env;
+        }
+    }
+    
+    return ast;
+}
 
-            'def!' : (rest) => {
-                
-                if (rest.type !== 'list') {
-                    throw new Exception('def! must be applied to a list');
-                }
-
-                const symbol = rest.value.shift();
-                if (symbol.type !== 'symbol' && symbol.type !== 'keyword') {
-                    throw new Exception('def! must be applied to symbol or keyword');
-                }
-
-                const body = rest.value.shift();
-                if (body.form !== 'atom') {
-                    call_stack.push([head, symbol]);
-                } else {
-                    env.set(symbol.value, body);
-                }
-
-                return body;
-            },
+/**
+*/
+/**
             'do'   : () => {/**
                              let length = ast.value.length,
                              last;
@@ -39,7 +118,7 @@ function Eval(ast, env) {
                              for(let i = 0; i < length; i++) {
                              last = new Eval(ast.value.shift(), env).eval_ast();
                              }
-                             return last;*/
+                             return last;
             },
             'fn*'  : () => { /**
                               let self           = this,
@@ -59,7 +138,7 @@ function Eval(ast, env) {
                               let inner_ast = JSON.parse(serialized_ast);
                               return new Eval(inner_ast, this.env).eval_ast();
                               }};
-                              */},
+                              },
             'if'   : () => {
                 let length = this.ast.value.length;
                 if (length < 2 || length > 3) {
@@ -95,25 +174,42 @@ function Eval(ast, env) {
                 let ret = new Eval(this.ast.value.shift(), env).eval_ast();
                 return ret;
             }
-        };
+              */
+/**
+        
 
+    
+    while(ast) {
+//        ast = build_ast(ast);
 
-        const head = ast.shift(),
-              rest = ast.shift();
-
-        if (special.hasOwnProperty(head.value)) {
-            return special[head.value](rest);
+        if (ast.hasOwnProperty('type') && ast.type === 'list') {
+            // New List to evaluate
+            ast = apply(eval_ast.list(ast));
+        } else if (Array.isArray(ast)) {
+            // Evaluating elements of a list
+            const current_element = ast.shift();
+            const evaled_element = eval_ast[current_element.type]();
+            call_stack.push(evaled_element);
+        } else if (ast.type === 'symbol') {
+            ast = eval_ast[ast.type]();
+            break;
         } else {
-            return env.get(head.value)(rest.value, env, call_stack);
+            break;
         }
+    }
+*/
 
-    };
+function eval_ast(ast, env, call_stack) {
 
-    const eval_ast = {
-
+    const ast_types = {
         'list'     : () => {
             const head = ast.value.shift();
-            return [head, ast];
+            const operation = env.get(head.value);
+            return {
+                ast : [operation, ast],
+                env : env,
+                call_stack : call_stack
+            };
         },
         'vector'   : () => {
             let list = this.ast.value,
@@ -140,39 +236,16 @@ function Eval(ast, env) {
         }
     };
 
-    const build_ast = (ast) => {
-        if (call_stack.length === 0) {
-            return ast;
-        } else if (ast.form === 'atom') {
-            let current_call = call_stack.pop();
-            current_call.push(ast);
-
-            let list_object = {
-                form : 'list',
-                type : 'list',
-                value : current_call
-            };
-            return list_object;
-        } else {
-            return ast;
-        }
-    };
-
-    while(ast) {
-        ast = build_ast(ast);
-        if (ast.form === 'list') {
-            ast = eval_ast[ast.type]();
-            ast = apply();
-        } else if (ast.type === 'symbol') {
-            ast = eval_ast[ast.type]();
-            break;
-        } else {
-            break;
-        }
+    if (ast_types.hasOwnProperty(ast.type)) {
+        return ast_types[ast.type]();
+    } else {
+        return {
+            ast: ast,
+            env: env,
+            call_stack: call_stack
+        };
     }
-    return ast;
 }
-
 
 module.exports = Eval;
 

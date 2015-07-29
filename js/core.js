@@ -21,25 +21,19 @@ function addition() {
                 if (head.type === 'integer') {
                     product += head.value;
                 } else if (head.type === 'symbol') {
-                    head.value = env.get(head.value);
+                    let object = env.get(head.value);
+                    if (object.type !== 'integer') {
+                        throw new Exception('attempted addition of non-integer');
+                    }
+                    product += object.value;
                 } else if (head.type === 'list') {
                     product = new Type(product);
                     list.unshift(head);
                     call_stack.push([new Type('+'), product]);
-                    break;
+                    return list;
                 }
             }
-
-            if (list.length > 0) {
-                let list_object = {
-                    form : 'list',
-                    type : 'list',
-                    value : list
-                };
-                return list_object;
-            } else {
-                return new Type(product);
-            }
+            return new Type(product);
         }
     };
 }
