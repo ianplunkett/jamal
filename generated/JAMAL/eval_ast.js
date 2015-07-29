@@ -3,8 +3,6 @@
 * Class: eval_ast
 */
 
-var Env = require('Env');
-
 /**
 * @return eval_ast 
 */
@@ -12,6 +10,14 @@ function eval_ast(ast, env){
     //Constructor
     this.AST = ast;
     this.ENV = env;
+
+    this.method_map = {
+        'list'     : this.list(),
+        'vector'   : this.vector(),
+        'hash-map' : this.hash_map(),
+        'symbol'   : this.symbol()
+    };
+
     return this;
 }
 

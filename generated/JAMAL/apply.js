@@ -3,12 +3,19 @@
 * Class: apply
 */
 
-function apply(){
+function apply(ast, env){
     //Constructor
 
-    this.AST = null;
-    this.ENV = null;
+    this.AST = ast;
+    this.ENV = env;
+    this.method_map = {
+        'do'   : this.do_(),
+        'fn*'  : this.fn_(),
+        'if'   : this.if_(),
+        'let*' : this.let_()
+    };
 
+    return this;
 }
 
 
