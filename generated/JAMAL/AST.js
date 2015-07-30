@@ -1,14 +1,12 @@
+'use strict';
 /**
 * Generated On: 2015-7-29
 * Class: AST
 */
 
-function AST(){
-    //Constructor
-
-    this.type = null;
-    this.value = null;
-
+function AST(type, value){
+    this.type = type;
+    this.value = value;
 }
 
 
@@ -16,8 +14,7 @@ function AST(){
 * @return AST {[object Object]} 
 */
 AST.prototype.parent = function(){
-    //TODO: Implement Me 
-
+    return false;
 };
 
 
@@ -25,8 +22,7 @@ AST.prototype.parent = function(){
 * @return AST {[object Object]} 
 */
 AST.prototype.children = function(){
-    //TODO: Implement Me 
-
+    return false;
 };
 
 
@@ -34,19 +30,17 @@ AST.prototype.children = function(){
 * @return AST {[object Object]} 
 */
 AST.prototype.left_sibling = function(){
-    //TODO: Implement Me 
-
+    return false;
 };
 
 
 /**
-* @param AST {[object Object]} 
+* @return AST {[object Object]} 
 */
-AST.prototype.right_sibling = function(AST){
-    //TODO: Implement Me 
-
+AST.prototype.right_sibling = function(){
+    return false;
 };
 
 
 
-module.exports = {AST:AST};
+module.exports = AST;
