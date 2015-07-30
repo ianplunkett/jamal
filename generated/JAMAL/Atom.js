@@ -1,14 +1,11 @@
-/**
-* Generated On: 2015-7-29
-* Class: Atom
-*/
+'use strict';
 
-var AST = require('./AST.js');
+const ASTNode = require('./ASTNode.js');
 
 function Atom(){
     //Constructor
 }
 
-Atom.prototype = new AST();
+Atom.prototype = new ASTNode();
 
 module.exports = Atom;

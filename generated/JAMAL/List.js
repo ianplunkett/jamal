@@ -1,9 +1,6 @@
-/**
-* Generated On: 2015-7-29
-* Class: List
-*/
+'use strict';
 
-var AST = require('./AST.js');
+const ASTNode = require('./ASTNode.js');
 
 function List(){
     //Constructor
@@ -11,7 +8,7 @@ function List(){
 
 }
 
-List.prototype = new AST();
+List.prototype = new ASTNode();
 
 List.prototype.children = function() {
     return new Array();
