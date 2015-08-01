@@ -36,7 +36,7 @@ ASTNode.prototype.addNextChild = function(ast_node) {
 When we remove the first child node, we need to update our references
 in the parent and next sibling
 */
-ASTNode.prototype.removeFirstNode = function() {
+ASTNode.prototype.removeFirstChild = function() {
     let first_child = this.first_child;
     first_child.next.previous = first_child.previous;
     first_child.parent.first_child = first_child.next;
@@ -50,7 +50,7 @@ ASTNode.prototype.removeFirstNode = function() {
 When we remove the last child node, we need to update our references
 in the parent and previous sibling
 */
-ASTNode.prototype.removeLastNode = function() {
+ASTNode.prototype.removeLastChild = function() {
     let last_child = this.last_child;
     last_child.previous.next = last_child.next;
     last_child.parent.last_child = last_child.previous;
