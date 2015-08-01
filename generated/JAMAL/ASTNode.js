@@ -9,12 +9,22 @@ function ASTNode(data) {
     this.last_child  = null;
 }
 
+/**
+When we add a child node to a parent node without any children, we
+need to assign both the first and last child for the parent node and
+the parent for the child node.
+*/
 ASTNode.prototype.addFirstChild = function(ast_node) {
     this.first_child = ast_node;
     this.last_child = ast_node;
     ast_node.parent = this;
 };
 
+/**
+When we add a child node to a parent node with children, we need to
+associate the siblings then assign and last child for the parent node
+and the parent for the child node.
+*/
 ASTNode.prototype.addNextChild = function(ast_node) {
     ast_node.previous = this.last_child;
     this.last_child.next = ast_node;
@@ -22,36 +32,32 @@ ASTNode.prototype.addNextChild = function(ast_node) {
     ast_node.parent = this;
 };
 
-const proto = ASTNode.prototype;
 /**
-Object.defineProperty(proto, "value", {
-    get: ()       => this.value,
-    set: (value)  => this.value = value
-});
-
-Object.defineProperty(proto, "parent", {
-    get: ()       => this.parent,
-    set: (parent) => this.parent = parent
-});
-
-Object.defineProperty(proto, "previous", {
-    get: ()     => this.previous,
-    set: (previous) => this.previous = previous
-});
-
-Object.defineProperty(proto, "next", {
-    get: ()      => this.next,
-    set: (next) => this.next = next
-});
-
-Object.defineProperty(proto, "first_child", {
-    get: ()     => this.first_child,
-    set: (first_child) => this.first_child = first_child
-});
-
-Object.defineProperty(proto, "last_child", {
-    get: ()      => this.last_child,
-    set: (last_child) => this.last_child = last_child
-});
+When we remove the first child node, we need to update our references
+in the parent and next sibling
 */
+ASTNode.prototype.removeFirstNode = function() {
+    let first_child = this.first_child;
+    first_child.next.previous = first_child.previous;
+    first_child.parent.first_child = first_child.next;
+    first_child.next = null;
+    first_child.previous = null;
+    first_child.parent = null;
+    return first_child;
+};
+
+/**
+When we remove the last child node, we need to update our references
+in the parent and previous sibling
+*/
+ASTNode.prototype.removeLastNode = function() {
+    let last_child = this.last_child;
+    last_child.previous.next = last_child.next;
+    last_child.parent.last_child = last_child.previous;
+    last_child.next = null;
+    last_child.previous = null;
+    last_child.parent = null;
+    return last_child;
+};
+
 module.exports = ASTNode;
