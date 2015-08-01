@@ -60,4 +60,9 @@ ASTNode.prototype.removeLastChild = function() {
     return last_child;
 };
 
+ASTNode.prototype.addPreviousSibling = function() {};
+ASTNode.prototype.addNextSibling = function() {};
+ASTNode.prototype.removePreviousSibling = function() {};
+ASTNode.prototype.removeNextSibling = function() {};
+
 module.exports = ASTNode;
