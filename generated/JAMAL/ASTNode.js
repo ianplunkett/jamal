@@ -25,7 +25,7 @@ When we add a child node to a parent node with children, we need to
 associate the siblings then assign and last child for the parent node
 and the parent for the child node.
 */
-ASTNode.prototype.addNextChild = function(ast_node) {
+ASTNode.prototype.addLastChild = function(ast_node) {
     ast_node.previous = this.last_child;
     this.last_child.next = ast_node;
     this.last_child = ast_node;
@@ -65,4 +65,4 @@ ASTNode.prototype.addNextSibling = function() {};
 ASTNode.prototype.removePreviousSibling = function() {};
 ASTNode.prototype.removeNextSibling = function() {};
 
-module.exports = ASTNode;
+export default ASTNode;
