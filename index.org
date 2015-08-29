@@ -59,3 +59,5 @@ CALL STACK: [[def!,a], [+,10], [+,10]]
 REST STACK: [[10]]
 
 AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK non-empty
+* TODO Integrate Reader with ASTNode
+* TODO Make Reader work with Web and CLI
