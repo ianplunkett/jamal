@@ -1,0 +1,17 @@
+{
+    "name": "jamal",
+    "version": "0.0.0",
+    "description": "Lisp interperter in ES5/ES6",
+    "scripts": {
+	"watch": "webpack --watch"
+    },
+    "devDependencies": {
+	"babel-core": "*",
+	"babel-loader": "^5.3.2",
+	"node-libs-browser": "*",
+	"webpack": "*",
+	"gulp": "*",
+	"gulp-sourcemaps": "*",
+	"gulp-babel": "*"
+    }
+}
