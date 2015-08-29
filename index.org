@@ -9,3 +9,55 @@
    away.
 ** Implementing a type system. Naive <2015-06-19 Fri>
    Think about homoiconicity
+** STATES IN EVAL LOOP
+   1. AST is a LIST, CALL STACK empty
+      1. test HEAD for SPECIAL definition
+      2. test HEAD for ENV definition
+      3. apply HEAD to REST of LIST
+	 1. CALL STACK is empty, break with AST
+	 2. CALL STACK is non-empty, loop with AST
+   2. AST is a LIST, CALL STACK non-empty
+      1. test HEAD for SPECIAL definition
+      2. test HEAD for ENV definition
+      3. apply HEAD to REST of LIST
+	 1. CALL STACK has not grown, pop CALL STACK, merge & loop
+	 2. CALL STACK has grown, loop with AST
+   3. AST is a PARTIAL LIST, CALL STACK non-empty
+      1. pop HEAD
+      2. test HEAD for SPECIAL definition
+      3. test HEAD for ENV definition
+   4. AST is an ATOM, CALL STACK empty
+      1. 
+   5. AST is an ATOM, CALL STACK non-empty
+
+
+(def! a (+ 10 (+ 10 (+ 10 10) 10) 10))
+
+AST is a LIST, CALL STACK empty, REST STACK empty
+CALL STACK: []
+REST STACK: []
+(def! a (+ 10 (+ 10 (+ 10 10) 10) 10))
+
+AST is a LIST, CALL STACK non-empty, REST STACK empty
+CALL STACK: [[def!,a]]
+REST STACK: []
+(+ 10 (+ 10 (+ 10 10) 10) 10)
+
+AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK empty
+CALL STACK: [[def!,a], [+,10]]
+REST STACK: []
+(+ 10 (+ 10 10) 10) 10
+
+AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK empty
+CALL STACK: [[def!,a], [+,10], [+,10]]
+REST STACK: [[10]]
+(+ 10 10) 10
+
+AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK non-empty
+20 10
+CALL STACK: [[def!,a], [+,10], [+,10]]
+REST STACK: [[10]]
+
+AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK non-empty
+* TODO Integrate Reader with ASTNode
+* TODO Make Reader work with Web and CLI

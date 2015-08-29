@@ -1,26 +1,37 @@
 'use strict';
 
-let Eval      = require('./eval.js'),
-    Exception = require('./exception.js'),
-    Printer   = require('./printer.js'),
-    Reader    = require('./reader.js'),
-    Tokenizer = require('./tokenizer.js'),
-    Type      = require('./type.js');
+import Eval      from './Eval.js';
+import Exception from './Exception.js';
+import Printer   from './Printer.js';
+import Reader    from './Reader.js';
+import Tokenizer from './Tokenizer.js';
+import Type      from './Type.js';
 
 function addition() {
     return {
         name : '+',
-        fn : (list, env) => {
+        fn : (list, env, call_stack) => {
             let product = 0;
             if (list.length < 2) {
                 throw Exception('Two or more elements required for addition');
             }
-            for (let head of list) {
-                let evaled_head = new Eval(head, env).eval_ast();
-                if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for addition');
+
+            while (list.length > 0) {
+                let head = list.shift();
+                if (head.type === 'integer') {
+                    product += head.value;
+                } else if (head.type === 'symbol') {
+                    let object = env.get(head.value);
+                    if (object.type !== 'integer') {
+                        throw new Exception('attempted addition of non-integer');
+                    }
+                    product += object.value;
+                } else if (head.type === 'list') {
+                    product = new Type(product);
+                    list.unshift(head);
+                    call_stack.push([new Type('+'), product]);
+                    return list;
                 }
-                product += evaled_head.value;
             }
             return new Type(product);
         }
@@ -410,11 +421,11 @@ function Core(env) {
 
     for (let specialForm in ns) {
         if (ns.hasOwnProperty(specialForm)) {
-            env.set(specialForm, ns[specialForm]);
+            env.set(specialForm, ns[specialForm].fn);
         }
     }
 
     return env;
 }
 
-module.exports = Core;
+export default Core;

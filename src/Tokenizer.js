@@ -13,4 +13,4 @@ function Tokenizer(input) {
     return filteredTokens;
 };
 
-module.exports = Tokenizer;
+export default Tokenizer;

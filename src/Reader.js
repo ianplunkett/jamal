@@ -1,25 +1,27 @@
 'use strict';
-let Exception = require('./exception.js'),
-    Type = require('./type.js');
+
+import ASTNode   from './ASTNode.js';
+import Exception from './Exception.js';
+import Type      from './Type.js';
 
 function Reader(tokens) {
-    this.tokens = tokens;
-    this.position = 0;
+    this.position = 0,
+    this.tokens   = tokens;
     return this;
 }
 
 Reader.prototype.read_str = function() {
-    let programData = this.read_form();
+    let ast = this.read_form();
 
-    if (this.tokens.length > this.position + 1) {
+    if (this.tokens.length > this.position + 2) {
         throw new Exception('read_str: EOF Error - Invalid Syntax');
     } else if (this.tokens.length > this.position) {
         var comment = this.read_form();
-        if (!comment.type === "comment-after-exp") {
+        if (!comment.data.type === "comment-after-exp") {
             throw new Exception('read_str: EOF Error - Invalid Syntax');
         }
     }
-    return programData;
+    return ast;
 };
 
 /** next returns the token at the current position and increments the position. */
@@ -41,54 +43,45 @@ Reader.prototype.read_form = function() {
 
     /** switch on complex types or default to atom processing */
     let current_token = this.peek(),
-        typed_token = new Type(current_token);
-    
+        typed_token   = new Type(current_token);
+
     switch (typed_token.form) {
         case 'list':
             /** List Form */
-            return this.list(typed_token);
+            return this.list(new ASTNode(typed_token));
             /** Key Value Form */
         case 'pair':
-            return this.pair(typed_token);
+            return this.pair(new ASTNode(typed_token));
         default:
             /** Atom Form */
             return this.atom(typed_token);
     }
 };
 
-Reader.prototype.pair = function(typed_token) {
-    let token = this.next();
-    typed_token.value = this.read_form();
-    return typed_token;
+Reader.prototype.pair = function(ast) {
+    this.next();
+    ast.addNextChild(this.read_form());
+    this.next();
+    return ast;
 };
 
-Reader.prototype.list = function(typed_token) {
-    let list = [],
-        obj = {},
-        token = this.next(),
-        type = typed_token.value;
-    
+Reader.prototype.list = function(ast_root) {
+
+    let token = this.next();
     while (true) {
-        if (token.value === typed_token.end) {
+        if (this.peek() === ast_root.data.end) {
             break;
-        } else if (token !== typed_token.begin) {
-            list.push(token);
+        } else {
+            let ast_node  = this.read_form();
+            ast_root.addNextChild(ast_node);
+            token = this.next();
         }
-        token = this.read_form();
     }
-    typed_token.type  = type;
-    typed_token.value = list;
-    return typed_token;
+    return ast_root;
 };
 
 Reader.prototype.atom = function(typed_token) {
-
-    // Increment to the next token, but throw it on the ground. We
-    // already have the typed token.
-    this.next();
-//    typed_token = typed_token.value.replace(/"/,'\"');
-    return typed_token;
-
+    return new ASTNode(typed_token);
 };
 
-module.exports = Reader;
+export default Reader;
