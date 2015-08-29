@@ -123,12 +123,11 @@ function list(token) {
         }
     ];
 
-    let value = {};
     for (let form of forms) {
         if (form.begin === token) {
-            typed_token.value  = form.type;
-            typed_token.begin = form.begin;
-            typed_token.end = form.end;
+            typed_token.type  = form.type,
+            typed_token.begin = form.begin,
+            typed_token.end   = form.end;
             break;
         }
     }
@@ -148,7 +147,7 @@ function Type(token) {
         typed_token = list(token);
     }
 
-    if (!typed_token.hasOwnProperty('value')) {
+    if (!typed_token.hasOwnProperty('type')) {
         typed_token = atom(token);
     }
 

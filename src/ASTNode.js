@@ -20,6 +20,15 @@ ASTNode.prototype.addFirstChild = function(ast_node) {
     ast_node.parent = this;
 };
 
+ASTNode.prototype.addNextChild = function(ast_node) {
+    if (this.first_child === null) {
+        this.addFirstChild(ast_node);
+    } else {
+        this.addLastChild(ast_node);
+    }
+};
+
+
 /**
 When we add a child node to a parent node with children, we need to
 associate the siblings then assign and last child for the parent node
@@ -60,6 +69,7 @@ ASTNode.prototype.removeLastChild = function() {
     return last_child;
 };
 
+/*
 ASTNode.prototype.addPreviousSibling = function(ast_node) {
     
 };
@@ -67,5 +77,6 @@ ASTNode.prototype.addPreviousSibling = function(ast_node) {
 ASTNode.prototype.addNextSibling = function() {};
 ASTNode.prototype.removePreviousSibling = function() {};
 ASTNode.prototype.removeNextSibling = function() {};
-
+*/
 export default ASTNode;
+
