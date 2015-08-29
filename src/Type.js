@@ -161,4 +161,4 @@ function Type(token) {
 
 }
 
-module.exports = Type;
+export default Type;

@@ -1,6 +1,8 @@
 'use strict';
-let Exception = require('./exception.js'),
-    Type = require('./type.js');
+
+import ASTNode   from './ASTNode.js';
+import Exception from './Exception.js';
+import Type      from './Type.js';
 
 function Reader(tokens) {
     this.tokens = tokens;
@@ -91,4 +93,4 @@ Reader.prototype.atom = function(typed_token) {
 
 };
 
-module.exports = Reader;
+export default Reader;

@@ -1,11 +1,11 @@
 'use strict';
 
-let Core      = require('./core.js'),
-    Env       = require('./env.js'),
-    Eval      = require('./eval.js'),
-    Printer   = require('./printer.js'),
-    Reader    = require('./reader.js'),
-    Tokenizer = require('./tokenizer.js');
+import Core      from './Core.js';
+import Env       from './Env.js';
+import Eval      from './Eval.js';
+import Printer   from './Printer.js';
+import Reader    from './Reader.js';
+import Tokenizer from './Tokenizer.js';
 
 
 function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }

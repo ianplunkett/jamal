@@ -1,6 +1,6 @@
 'use strict';
-let Exception = require('./exception.js'),
-    Type = require('./type.js');
+import Exception from './Exception.js';
+import Type      from './Type.js';
 
 function Printer(malData, print_readably) {
     this.malData = malData;
@@ -94,4 +94,4 @@ Printer.prototype.pr_str = function() {
 };
 
 
-module.exports = Printer;
+export default Printer;

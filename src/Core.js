@@ -1,11 +1,11 @@
 'use strict';
 
-let Eval      = require('./eval.js'),
-    Exception = require('./exception.js'),
-    Printer   = require('./printer.js'),
-    Reader    = require('./reader.js'),
-    Tokenizer = require('./tokenizer.js'),
-    Type      = require('./type.js');
+import Eval      from './Eval.js';
+import Exception from './Exception.js';
+import Printer   from './Printer.js';
+import Reader    from './Reader.js';
+import Tokenizer from './Tokenizer.js';
+import Type      from './Type.js';
 
 function addition() {
     return {
@@ -428,4 +428,4 @@ function Core(env) {
     return env;
 }
 
-module.exports = Core;
+export default Core;

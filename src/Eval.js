@@ -1,8 +1,8 @@
 'use strict';
 
-const Env       = require('./env.js'),
-      Exception = require('./exception.js'),
-      Type      = require('./type.js');
+import Env       from './Env.js';
+import Exception from './Exception.js';
+import Type      from './Type.js';
 
 
 const build_ast = (ast, call_stack) => {
@@ -247,5 +247,5 @@ function eval_ast(ast, env, call_stack) {
     }
 }
 
-module.exports = Eval;
+export default Eval;
 

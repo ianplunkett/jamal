@@ -1,6 +1,6 @@
 'use strict';
-let Exception = require('./exception.js'),
-    Type = require('./type.js');;
+import Exception from './Exception.js';
+import Type      from './Type.js';
     
 function Env(outer, binds, exprs) {
     this.outer = outer;
@@ -55,4 +55,4 @@ Env.prototype.get = function(key) {
 };
 
 
-module.exports = Env;
+export default Env;
