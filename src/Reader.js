@@ -13,11 +13,11 @@ function Reader(tokens) {
 Reader.prototype.read_str = function() {
     let ast = this.read_form();
 
-    if (this.tokens.length > this.position + 1) {
+    if (this.tokens.length > this.position + 2) {
         throw new Exception('read_str: EOF Error - Invalid Syntax');
     } else if (this.tokens.length > this.position) {
         var comment = this.read_form();
-        if (!comment.type === "comment-after-exp") {
+        if (!comment.data.type === "comment-after-exp") {
             throw new Exception('read_str: EOF Error - Invalid Syntax');
         }
     }
@@ -51,17 +51,18 @@ Reader.prototype.read_form = function() {
             return this.list(new ASTNode(typed_token));
             /** Key Value Form */
         case 'pair':
-            return this.pair(typed_token);
+            return this.pair(new ASTNode(typed_token));
         default:
             /** Atom Form */
             return this.atom(typed_token);
     }
 };
 
-Reader.prototype.pair = function(typed_token) {
-    let token = this.next();
-    typed_token.value = this.read_form();
-    return typed_token;
+Reader.prototype.pair = function(ast) {
+    this.next();
+    ast.addNextChild(this.read_form());
+    this.next();
+    return ast;
 };
 
 Reader.prototype.list = function(ast_root) {
