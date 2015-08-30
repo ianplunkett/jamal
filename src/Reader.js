@@ -1,4 +1,5 @@
 'use strict';
+'use strict';
 
 import ASTNode   from './ASTNode.js';
 import Exception from './Exception.js';
@@ -18,7 +19,7 @@ Reader.prototype.read_str = function() {
     } else if (this.tokens.length > this.position) {
         var comment = this.read_form();
         if (!comment.data.type === "comment-after-exp") {
-            throw new Exception('read_str: EOF Error - Invalid Syntax');
+            throw new Exception('read_str: EOF Error2 - Invalid Syntax');
         }
     }
     return ast;
@@ -29,7 +30,7 @@ Reader.prototype.next = function() {
     if (this.position > this.tokens.length) {
         throw new Exception('EOF Error - Invalid Syntax');
     }
-    var token = this.tokens[this.position];
+    let token = this.tokens[this.position];
     this.position++;
     return token;
 };
@@ -42,19 +43,19 @@ Reader.prototype.peek = function() {
 Reader.prototype.read_form = function() {
 
     /** switch on complex types or default to atom processing */
-    let current_token = this.peek(),
-        typed_token   = new Type(current_token);
+    const token = this.peek(),
+          ast   = new ASTNode(token);
 
-    switch (typed_token.form) {
+    switch (token.form) {
         case 'list':
             /** List Form */
-            return this.list(new ASTNode(typed_token));
+            return this.list(ast);
             /** Key Value Form */
         case 'pair':
-            return this.pair(new ASTNode(typed_token));
+            return this.pair(ast);
         default:
             /** Atom Form */
-            return this.atom(typed_token);
+            return ast;
     }
 };
 
@@ -69,19 +70,15 @@ Reader.prototype.list = function(ast_root) {
 
     let token = this.next();
     while (true) {
-        if (this.peek() === ast_root.data.end) {
+        if (this.peek().value === ast_root.data.end) {
             break;
         } else {
-            let ast_node  = this.read_form();
+            const ast_node = this.read_form();
             ast_root.addNextChild(ast_node);
             token = this.next();
         }
     }
     return ast_root;
-};
-
-Reader.prototype.atom = function(typed_token) {
-    return new ASTNode(typed_token);
 };
 
 export default Reader;
