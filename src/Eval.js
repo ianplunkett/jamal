@@ -4,7 +4,84 @@ import Env       from './Env.js';
 import Exception from './Exception.js';
 import Type      from './Type.js';
 
+function Eval(ast, env){
 
+    do {
+        [ast, env] = eval_ast(ast, env);
+        [ast, env] = apply(ast, env);
+    } while (ast)
+
+    return [ast, env];
+}
+
+function eval_ast(ast, env) {
+    const type = ast.data.type;
+    switch(type) {
+        case "symbol":
+            return [ast, env];
+        case "list":
+            return [ast.first_child, env];
+        case "vector":
+            return [ast.first_child, env];
+        case "hash-map":
+            return [ast.first_child, env];
+        default:
+            throw new Exception("eval_ast: Unknown data type");
+    }
+}
+
+function apply(ast, env) {
+    const value = ast.data.value;
+    switch(value) {
+        case "let*":
+            return apply_let(ast, env);
+        case "do":
+            return apply_do(ast, env);
+        case "if":
+            return apply_if(ast, env);
+        case "fn*":
+            return apply_fn(ast, env);
+        case "def!":
+            return apply_def(ast, env);
+        default:
+            return apply_env(ast, env);
+    }
+
+    ast = null;
+    return [ast, env];
+}
+
+function apply_let(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+function apply_do(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+function apply_if(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+function apply_def(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+function apply_fn(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+function apply_env(ast,env) {
+    ast = null;
+    return [ast, env];
+}
+
+/*
 const build_ast = (ast, call_stack) => {
 
     if (call_stack.length === 0) {
@@ -199,7 +276,7 @@ function Eval(ast, env) {
     }
 */
 
-function eval_ast(ast, env, call_stack) {
+/* function eval_ast(ast, env, call_stack) {
 
     const ast_types = {
         'list'     : () => {
@@ -245,7 +322,7 @@ function eval_ast(ast, env, call_stack) {
             call_stack: call_stack
         };
     }
-}
+} */
 
 export default Eval;
 
