@@ -12,7 +12,7 @@ npm install
 
 ## Building ES5 compatible javascript
 
-jamal uses a few ES6 features which are not supposed by node or any of the latest browsers.  The source code must be transpiled to work properly. To transpile the source, enter the root of the project and type:
+jamal uses a few ES6 features which are not supported by node or any of the latest browsers.  The source code must be transpiled to work properly. To transpile the source, enter the root of the project and type:
 
 ```
 gulp --gulpfile config/gulpfile.js babel
