@@ -10,7 +10,16 @@ import Type      from './Type.js';
 function addition() {
     return {
         name : '+',
-        fn : (list, env, call_stack) => {
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                ast.data.value += ast.next_sibling.data.value;
+                ast.removeNextSibling();
+            }
+            ast.parent.data = ast.data;
+            let parent = ast.parent;
+            parent.removeLastChild();
+            return [parent, env];
+            /*
             let product = 0;
             if (list.length < 2) {
                 throw Exception('Two or more elements required for addition');
@@ -34,6 +43,7 @@ function addition() {
                 }
             }
             return new Type(product);
+             */
         }
     };
 }

@@ -61,12 +61,26 @@ in the parent and previous sibling
 */
 ASTNode.prototype.removeLastChild = function() {
     let last_child = this.last_child;
-    last_child.previous.next_sibling = last_child.next_sibling;
+    last_child.previous_sibling.next_sibling = last_child.next_sibling;
     last_child.parent.last_child = last_child.previous_sibling;
     last_child.next_sibling = null;
     last_child.previous_sibling = null;
     last_child.parent = null;
     return last_child;
+};
+
+/**
+When we remove the next sibling node, we need to update our references
+in the parent and previous sibling
+*/
+ASTNode.prototype.removeNextSibling = function() {
+    let next_sibling = this.next_sibling;
+    next_sibling.previous_sibling.next_sibling = next_sibling.next_sibling;
+    next_sibling.parent.next_sibling = next_sibling.previous_sibling;
+    next_sibling.next_sibling = null;
+    next_sibling.previous_sibling = null;
+    next_sibling.parent = null;
+    return next_sibling;
 };
 
 /*

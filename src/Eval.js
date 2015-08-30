@@ -15,9 +15,12 @@ function Eval(ast, env){
 }
 
 function eval_ast(ast, env) {
+
     const type = ast.data.type;
+
     switch(type) {
         case "symbol":
+            ast.data.value = env.get(ast.data.value);
             return [ast, env];
         case "list":
             return [ast.first_child, env];
@@ -26,12 +29,14 @@ function eval_ast(ast, env) {
         case "hash-map":
             return [ast.first_child, env];
         default:
-            throw new Exception("eval_ast: Unknown data type");
+            return [ast, env];
     }
 }
 
 function apply(ast, env) {
+    
     const value = ast.data.value;
+
     switch(value) {
         case "let*":
             return apply_let(ast, env);
@@ -76,8 +81,10 @@ function apply_fn(ast,env) {
     return [ast, env];
 }
 
-function apply_env(ast,env) {
-    ast = null;
+function apply_env(ast, env) {
+    const symbol = ast.data.value,
+          apply  = env.get(symbol);
+    [ast, env] = apply(ast.next_sibling, env);
     return [ast, env];
 }
 
