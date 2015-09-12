@@ -12,7 +12,6 @@
 	"webpack": "*",
 	"gulp": "*",
 	"gulp-sourcemaps": "*",
-	"gulp-babel": "*",
-	"gulp-exec": "*"
+	"gulp-babel": "*"
     }
 }

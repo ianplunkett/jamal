@@ -26,7 +26,7 @@ function test_scenario_1() {
     let out = new Printer(ast_from_reader).pr_str();
 
     // Assertions
-    console.assert(out !== text, "Input should match output");
+    console.assert(out === text, "Input should match output");
     console.assert(out !== text2, "Input should not match output");
 }
 

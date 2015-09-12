@@ -18,6 +18,17 @@ gulp.task('babel', function () {
         .pipe(gulp.dest(paths.es5));
 });
 gulp.task('watch', function() {
-    gulp.watch(paths.es6, ['babel']);
+    gulp.watch(paths.es6, ['test']);
 });
+
+var exec = require('child_process').exec;
+ 
+gulp.task('test', ['babel'], function (cb) {
+  exec('node ../out/cli/test.js', function (err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
+});
+
 gulp.task('default', ['watch']);
