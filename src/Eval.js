@@ -9,9 +9,9 @@ function Eval(ast, env){
     do {
         [ast, env] = eval_ast(ast, env);
         [ast, env] = apply(ast, env);
-    } while (ast)
+    } while (!ast.isEvaled())
 
-    return [ast, env];
+    return ast;
 }
 
 function eval_ast(ast, env) {
@@ -82,10 +82,14 @@ function apply_fn(ast,env) {
 }
 
 function apply_env(ast, env) {
-    const symbol = ast.data.value,
-          apply  = env.get(symbol);
-    [ast, env] = apply(ast.next_sibling, env);
-    return [ast, env];
+    if (ast.data.type !== 'symbol') {
+        return [ast, env];
+    } else {
+        const symbol = ast.data.value,
+              apply  = env.get(symbol);
+        [ast, env] = apply(ast.next_sibling, env);
+        return [ast, env];
+    }
 }
 
 /*
