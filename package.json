@@ -12,6 +12,7 @@
 	"webpack": "*",
 	"gulp": "*",
 	"gulp-sourcemaps": "*",
-	"gulp-babel": "*"
+	"gulp-babel": "*",
+	"gulp-exec": "*"
     }
 }
