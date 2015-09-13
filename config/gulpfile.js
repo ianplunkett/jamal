@@ -5,7 +5,7 @@ var babel = require('gulp-babel');
 var path = require('path');
 
 var paths = {
-    es6: ['../src/*.js'],
+    es6: ['../src/*.js', '../tests/test.js'],
     es5: '../out/cli/',
     // Must be absolute or relative to source map
     sourceRoot: path.join(__dirname, 'es6')
@@ -18,6 +18,16 @@ gulp.task('babel', function () {
         .pipe(gulp.dest(paths.es5));
 });
 gulp.task('watch', function() {
-    gulp.watch(paths.es6, ['babel']);
+    gulp.watch(paths.es6, ['test']);
 });
+
+var exec = require('child_process').exec;
+ 
+gulp.task('test', ['babel'], function (cb) {
+  exec('node ../out/cli/test.js', function (err, stdout, stderr) {
+    console.log(stdout);
+    cb(err);
+  });
+});
+
 gulp.task('default', ['watch']);

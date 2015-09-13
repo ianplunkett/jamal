@@ -7,33 +7,31 @@ import Reader    from './Reader.js';
 import Tokenizer from './Tokenizer.js';
 import Type      from './Type.js';
 
+
+// TODO, refactor arithmetic functions. Very similar functionality, can be pulled out
 function addition() {
     return {
         name : '+',
-        fn : (list, env, call_stack) => {
-            let product = 0;
-            if (list.length < 2) {
-                throw Exception('Two or more elements required for addition');
-            }
-
-            while (list.length > 0) {
-                let head = list.shift();
-                if (head.type === 'integer') {
-                    product += head.value;
-                } else if (head.type === 'symbol') {
-                    let object = env.get(head.value);
-                    if (object.type !== 'integer') {
-                        throw new Exception('attempted addition of non-integer');
-                    }
-                    product += object.value;
-                } else if (head.type === 'list') {
-                    product = new Type(product);
-                    list.unshift(head);
-                    call_stack.push([new Type('+'), product]);
-                    return list;
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
                 }
+                ast.data.value += ast.next_sibling.data.value;
+                ast.removeNextSibling();
             }
-            return new Type(product);
+            ast.parent.data = ast.data;
+            let parent = ast.parent;
+            parent.removeLastChild();
+            parent.removeLastChild();
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
         }
     };
 }
@@ -41,23 +39,26 @@ function addition() {
 function subtraction() {
     return {
         name : '-',
-        fn : (list, env) => {
-            if (list.length < 2) {
-                throw Exception('Two or more elements required for subtraction');
-            }
-            let product = undefined;
-            for (let head of list) {
-                let evaled_head = new Eval(head, env).eval_ast();
-                if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for subtraction');
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
                 }
-                if (product === undefined) {
-                    product = evaled_head.value;
-                } else {
-                    product -= evaled_head.value;
-                }
+                ast.data.value -= ast.next_sibling.data.value;
+                ast.removeNextSibling();
             }
-            return new Type(product);
+            ast.parent.data = ast.data;
+            let parent = ast.parent;
+            parent.removeLastChild();
+            parent.removeLastChild();
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
         }
     };
 }
@@ -65,23 +66,26 @@ function subtraction() {
 function multiplication() {
     return {
         name : '*',
-        fn : (list, env) => {
-            if (list.length < 2) {
-                throw Exception('Two or more elements required for multiplication');
-            }
-            let product = undefined;
-            for (let head of list) {
-                let evaled_head = new Eval(head, env).eval_ast();
-                if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for multiplication');
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
                 }
-                if (product === undefined) {
-                    product = evaled_head.value;
-                } else {
-                    product *= evaled_head.value;
-                }
+                ast.data.value *= ast.next_sibling.data.value;
+                ast.removeNextSibling();
             }
-            return new Type(product);
+            ast.parent.data = ast.data;
+            let parent = ast.parent;
+            parent.removeLastChild();
+            parent.removeLastChild();
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
         }
     };
 }
@@ -89,26 +93,26 @@ function multiplication() {
 function division() {
     return {
         name : '/',
-        type_signature : 'Integer...',
-        return_type    : 'Integer',
-        base_case      : () => ({value: undefined}),
-        fn : (list, env) => {
-            if (list.length < 2) {
-                throw Exception('Two or more elements required for division');
-            }
-            let product = undefined;
-            for (let head of list) {
-                let evaled_head = new Eval(head, env).eval_ast();
-                if (evaled_head.type !== 'integer') {
-                    throw Exception('Integer values required for division');
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
                 }
-                if (product === undefined) {
-                    product = evaled_head.value;
-                } else {
-                    product /= evaled_head.value;
-                }
+                ast.data.value /= ast.next_sibling.data.value;
+                ast.removeNextSibling();
             }
-            return new Type(product);
+            ast.parent.data = ast.data;
+            let parent = ast.parent;
+            parent.removeLastChild();
+            parent.removeLastChild();
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
         }
     };
 }
@@ -117,7 +121,25 @@ function division() {
 function list() {
     return {
         name : 'list',
-        fn : (list, env) => {
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
+                }
+                ast = ast.next_sibling;
+            }
+            let parent = ast.parent;
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
+        }
+        /*
+        fn : (ast, env) => {
             let out_list = new Reader(new Tokenizer('()')).read_str();
             if (list.count === 0) {
                 return out_list;
@@ -129,7 +151,7 @@ function list() {
                 return out_list;
             }
 
-        }
+        }*/
         
     };
 }

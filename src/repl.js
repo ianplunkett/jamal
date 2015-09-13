@@ -10,13 +10,11 @@ import Tokenizer from './Tokenizer.js';
 
 function READ(text) { return (new Reader(new Tokenizer(text))).read_str(); }
 
-function EVAL(env, ast) { return new Eval(ast, env); }
+function EVAL(ast, env) { return new Eval(ast, env); }
 
 function PRINT(malData) { return new Printer(malData).pr_str(); }
 
-function rep(env, text) { return PRINT(READ(text));}
-
-//function rep(env, text) { return PRINT(EVAL(env,READ(text)));}
+function rep(text, env) { return PRINT(EVAL(READ(text),env)); }
 
 function main() {
 
@@ -30,7 +28,7 @@ function main() {
 //    rep(env, '(def! not (fn* (a) (if a false true)))');
     rl.on('line', function(line) {
         try {
-            console.log(rep(env, line));
+            console.log(rep(line, env));
         } catch(e) {
             console.log(e);
             console.log('try again');
