@@ -8,10 +8,11 @@
     "devDependencies": {
 	"babel-core": "*",
 	"babel-loader": "^5.3.2",
-	"node-libs-browser": "*",
-	"webpack": "*",
 	"gulp": "*",
+	"gulp-babel": "*",
+	"gulp-notify": "^2.2.0",
 	"gulp-sourcemaps": "*",
-	"gulp-babel": "*"
+	"node-libs-browser": "*",
+	"webpack": "*"
     }
 }
