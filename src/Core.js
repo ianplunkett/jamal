@@ -7,6 +7,8 @@ import Reader    from './Reader.js';
 import Tokenizer from './Tokenizer.js';
 import Type      from './Type.js';
 
+
+// TODO, refactor arithmetic functions. Very similar functionality, can be pulled out
 function addition() {
     return {
         name : '+',
@@ -119,7 +121,25 @@ function division() {
 function list() {
     return {
         name : 'list',
-        fn : (list, env) => {
+        fn : (ast, env) => {
+            while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                } else if (ast.data.form === 'list') {
+                    return [ast, env];
+                }
+                ast = ast.next_sibling;
+            }
+            let parent = ast.parent;
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
+        }
+        /*
+        fn : (ast, env) => {
             let out_list = new Reader(new Tokenizer('()')).read_str();
             if (list.count === 0) {
                 return out_list;
@@ -131,7 +151,7 @@ function list() {
                 return out_list;
             }
 
-        }
+        }*/
         
     };
 }

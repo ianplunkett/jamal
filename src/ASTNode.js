@@ -7,6 +7,7 @@ function ASTNode(data) {
     this.parent           = null,
     this.first_child      = null,
     this.last_child       = null;
+    this.evaled           = null;
 }
 
 /**
@@ -28,16 +29,6 @@ ASTNode.prototype.addNextChild = function(ast_node) {
     }
 };
 
-
-ASTNode.prototype.isEvaled = function(ast_node) {
-    if (this.first_child === null && this.last_child === null && this.parent === null && this.next_sibling === null && this.previous_sibling === null) {
-        return true;
-    } else {
-        return false;
-    }
-};
-
-
 /**
 When we add a child node to a parent node with children, we need to
 associate the siblings then assign and last child for the parent node
@@ -57,7 +48,7 @@ in the parent and next sibling
 ASTNode.prototype.removeFirstChild = function() {
     let first_child = this.first_child;
     if (first_child.parent !== null){
-        this.parent.first_child = first_child.next_sibling;
+        first_child.parent.first_child = first_child.next_sibling;
     } else {
         this.first_child = null;
     }

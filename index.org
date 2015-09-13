@@ -59,5 +59,24 @@ CALL STACK: [[def!,a], [+,10], [+,10]]
 REST STACK: [[10]]
 
 AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK non-empty
-* TODO Integrate Reader with ASTNode
-* TODO Make Reader work with Web and CLI
+** Eval Return Rules 
+   1. List
+      1. Not Evaled
+	 return first child and environment
+      2. Evaled
+	 1. Has Parent
+	    - return parent and environment
+	 2. Does not have parent
+	    - return self and environment
+   2. Atom
+      1. Not Evaled
+	 1. Eval atom
+	 2. Has next sibling
+	    - return next sibling and environment
+	 3. Does not have next sibling
+	    - Mark parent evaled
+	    - return parent and environment
+	 
+
+
+
