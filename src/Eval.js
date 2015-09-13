@@ -13,7 +13,7 @@ function Eval(ast, env){
         if (ast.data.form === 'pair') {
             break;
         }
-    } while (!ast.evaled)
+    } while (ast.evaled === null || ast.parent !== null)
 
     return ast;
 }
@@ -25,9 +25,9 @@ function eval_symbol(ast, env) {
 
 function eval_list(ast, env) {
     if (!ast.evaled) {
-        return [ast.first_child, env];  
-    } else if (!ast.parent === null) {
-        return [ast.parent, env];       
+        return [ast.first_child, env];
+    } else if (ast.parent !== null) {
+        return [ast.parent, env];
     } else {
         return [ast, env];
     }
@@ -35,16 +35,28 @@ function eval_list(ast, env) {
 }
 
 function eval_vector(ast, env) {
-    return [ast.first_child, env];
+    if (!ast.evaled) {
+        return [ast.first_child, env];
+    } else if (ast.parent !== null) {
+        return [ast.parent, env];
+    } else {
+        return [ast, env];
+    }
 }
 
 function eval_hash_map(ast, env) {
-    return [ast.first_child, env];
+    if (!ast.evaled) {
+        return [ast.first_child, env];
+    } else if (ast.parent !== null) {
+        return [ast.parent, env];
+    } else {
+        return [ast, env];
+    }
 }
 
 function eval_atom(ast, env) {
     if (!ast.evaled && ast.next_sibling !== null) {
-        return [ast.next_sibling, env]; 
+        return [ast, env];
     } else if (ast.parent !== null) {
         ast.parent.evaled = true;
         return [ast, env];
@@ -74,7 +86,7 @@ function eval_ast(ast, env) {
 }
 
 function apply(ast, env) {
-    
+
     const value = ast.data.value;
 
     switch(value) {
@@ -127,10 +139,10 @@ function apply_env(ast, env) {
         if (ast.next_sibling !== null) {
             return [ast.next_sibling, env];
         } else if (ast.parent !== null && ast.first_child === null) {
-            console.log(ast);
             ast.parent.evaled = true;
             return [ast.parent, env];
         } else {
+            ast.evaled = true;
             return [ast, env];
         }
     } else {
@@ -145,7 +157,7 @@ function apply_env(ast, env) {
             'do'   : () => {/**
                              let length = ast.value.length,
                              last;
-                             
+
                              for(let i = 0; i < length; i++) {
                              last = new Eval(ast.value.shift(), env).eval_ast();
                              }
@@ -156,7 +168,7 @@ function apply_env(ast, env) {
                               binds          = self.ast.value.shift(),
                               ast            = self.ast.value.shift(),
                               serialized_ast = JSON.stringify(ast);
-                              
+
                               return {
                               form : 'closure',
                               fn   : (exprs, env) => {
@@ -182,17 +194,17 @@ function apply_env(ast, env) {
                 } else if (length === 2) {
                     return new Type('nil');
                 } else {
-                    // TODO - why do we throw this value on the floor?  
+                    // TODO - why do we throw this value on the floor?
                     this.ast.value.shift();
                     return new Eval(this.ast.value.shift(), this.env).eval_ast();
                 }
-                
+
 
             },
             'let*' : () => {
                 let env = new Env(this.env),
                     bindings = this.ast.value.shift();
-                
+
                 if (bindings.value.length % 2 === 1) {
                     throw new Exception('poorly formatted binding list');
                 }
@@ -208,4 +220,3 @@ function apply_env(ast, env) {
               */
 
 export default Eval;
-
