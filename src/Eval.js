@@ -124,8 +124,20 @@ function apply_if(ast,env) {
 }
 
 function apply_def(ast,env) {
-    ast = null;
-    return [ast, env];
+    const variable = ast.next_sibling;
+    const value = variable.next_sibling;
+    if (value.data.form === 'list' && value.evaled !== true) {
+        return [value, env];
+    } else {
+        const parent = variable.parent;
+        parent.data = variable.data;
+        parent.removeLastChild();
+        parent.removeLastChild();
+        parent.removeFirstChild();
+        env.set(parent.data.value, value);
+        parent.data.type = 'string';
+        return [parent, env];
+    }
 }
 
 function apply_fn(ast,env) {
@@ -146,6 +158,7 @@ function apply_env(ast, env) {
             return [ast, env];
         }
     } else {
+        // TODO we are already doing this in eval_ast. needs a refactor
         const symbol = ast.data.value,
               apply  = env.get(symbol);
         [ast, env] = apply(ast.next_sibling, env);

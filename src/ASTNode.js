@@ -49,9 +49,17 @@ ASTNode.prototype.removeFirstChild = function() {
     let first_child = this.first_child;
     if (first_child.parent !== null){
         first_child.parent.first_child = first_child.next_sibling;
+        if (first_child.next_sibling === null) {
+            first_child.parent.last_child = null;
+        }           
+    } else if (first_child.next_sibling === null) {
+        first_child.parent.last_child = null;
+        this.first_child = null;
     } else {
         this.first_child = null;
     }
+
+    
     first_child.next_sibling = null;
     first_child.previous_sibling = null;
     first_child.parent = null;

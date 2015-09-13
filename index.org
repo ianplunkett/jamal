@@ -76,7 +76,5 @@ AST is a PARTIAL LIST, CALL STACK non-empty, REST STACK non-empty
 	 3. Does not have next sibling
 	    - Mark parent evaled
 	    - return parent and environment
-	 
-
-
-
+** Object Registry
+   Create an indexed object registry
