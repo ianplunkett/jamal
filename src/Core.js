@@ -12,13 +12,22 @@ function addition() {
         name : '+',
         fn : (ast, env) => {
             while(ast.next_sibling) {
+                if (ast.next_sibling.data.form === 'list') {
+                    return [ast.next_sibling, env];
+                }
                 ast.data.value += ast.next_sibling.data.value;
                 ast.removeNextSibling();
             }
             ast.parent.data = ast.data;
             let parent = ast.parent;
             parent.removeLastChild();
-            return [parent, env];
+            parent.removeLastChild();
+            parent.removeFirstChild();
+            if (parent.parent !== null) {
+                return [parent.parent, env];
+            } else {
+                return [parent, env];
+            }
             /*
             let product = 0;
             if (list.length < 2) {

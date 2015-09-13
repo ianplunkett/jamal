@@ -26,7 +26,6 @@ var exec = require('child_process').exec;
 gulp.task('test', ['babel'], function (cb) {
   exec('node ../out/cli/test.js', function (err, stdout, stderr) {
     console.log(stdout);
-    console.log(stderr);
     cb(err);
   });
 });
