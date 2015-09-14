@@ -23,28 +23,7 @@ function eval_symbol(ast, env) {
     return [ast, env];
 }
 
-function eval_list(ast, env) {
-    if (!ast.evaled) {
-        return [ast.first_child, env];
-    } else if (ast.parent !== null) {
-        return [ast.parent, env];
-    } else {
-        return [ast, env];
-    }
-
-}
-
-function eval_vector(ast, env) {
-    if (!ast.evaled) {
-        return [ast.first_child, env];
-    } else if (ast.parent !== null) {
-        return [ast.parent, env];
-    } else {
-        return [ast, env];
-    }
-}
-
-function eval_hash_map(ast, env) {
+function eval_list_form(ast, env) {
     if (!ast.evaled) {
         return [ast.first_child, env];
     } else if (ast.parent !== null) {
@@ -75,11 +54,11 @@ function eval_ast(ast, env) {
         case "symbol":
             return eval_symbol(ast, env);
         case "list":
-            return eval_list(ast, env);
+            return eval_list_form(ast, env);
         case "vector":
-            return eval_vector(ast, env);
+            return eval_list_form(ast, env);
         case "hash-map":
-            return eval_hash_map(ast, env);
+            return eval_list_form(ast, env);
         default:
             return eval_atom(ast, env);
     }
