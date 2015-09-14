@@ -19,7 +19,7 @@ function Eval(ast, env){
 }
 
 function eval_symbol(ast, env) {
-    ast.data.value = env.get(ast.data.value);
+//    ast.data.value = env.get(ast.data.value);
     return [ast, env];
 }
 
@@ -109,11 +109,11 @@ function apply_def(ast,env) {
         return [value, env];
     } else {
         const parent = variable.parent;
-        parent.data = variable.data;
+        parent.data = value.data;
         parent.removeLastChild();
         parent.removeLastChild();
         parent.removeFirstChild();
-        env.set(parent.data.value, value);
+        env.set(variable.data.value, value);
         parent.data.type = 'string';
         return [parent, env];
     }
@@ -138,9 +138,12 @@ function apply_env(ast, env) {
         }
     } else {
         // TODO we are already doing this in eval_ast. needs a refactor
-        const symbol = ast.data.value,
-              apply  = env.get(symbol);
-        [ast, env] = apply(ast.next_sibling, env);
+        let apply  = env.get(ast.data.value);
+        if (typeof apply === 'function') {
+            [ast, env] = apply(ast.next_sibling, env);
+        } else {
+            ast = apply;
+        }
         return [ast, env];
     }
 }

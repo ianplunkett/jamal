@@ -14,7 +14,18 @@ function arithmetic (ast, env, fn) {
         } else if (ast.data.form === 'list') {
             return [ast, env];
         }
-        ast.data.value = fn(ast.data.value, ast.next_sibling.data.value);
+
+        let a = ast.data.value,
+            b = ast.next_sibling.data.value;
+        if (ast.data.type === 'symbol') {
+            a = env.get(a);
+        }
+
+        if (ast.next_sibling.data.type === 'symbol') {
+            b = env.get(b).data.value;
+        }
+
+        ast.data.value = fn(a, b);
         ast.removeNextSibling();
     }
     ast.parent.data = ast.data;
