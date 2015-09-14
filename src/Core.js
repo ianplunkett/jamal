@@ -33,7 +33,7 @@ function addition() {
     const operation = (a, b) => a + b;
     return {
         fn: (ast, env) => {
-            return arithmetic(ast, env, operation );
+            return arithmetic(ast, env, operation);
         }
     };
 }
@@ -42,7 +42,7 @@ function subtraction() {
     const operation = (a, b) => a - b;
     return {
         fn: (ast, env) => {
-            return arithmetic(ast, env, operation );
+            return arithmetic(ast, env, operation);
         }
     };
 }
@@ -51,7 +51,7 @@ function multiplication() {
     const operation = (a, b) => a * b;
     return {
         fn: (ast, env) => {
-            return arithmetic(ast, env, operation );
+            return arithmetic(ast, env, operation);
         }
     };
 }
@@ -60,7 +60,7 @@ function division() {
     const operation = (a, b) => a / b;
     return {
         fn: (ast, env) => {
-            return arithmetic(ast, env, operation );
+            return arithmetic(ast, env, operation);
         }
     };
 }
@@ -68,7 +68,7 @@ function division() {
 
 function list() {
     return {
-        
+
         fn : (ast, env) => {
             while(ast.next_sibling) {
                 if (ast.next_sibling.data.form === 'list') {
@@ -100,13 +100,13 @@ function list() {
             }
 
         }*/
-        
+
     };
 }
 
 function is_list() {
     return {
-        
+
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -121,7 +121,7 @@ function is_list() {
 
 function is_empty() {
     return {
-        
+
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -130,14 +130,14 @@ function is_empty() {
             } else {
                 return new Type('false');;
             }
-            
+
         }
     };
 }
 
 function count() {
     return {
-        
+
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -146,14 +146,14 @@ function count() {
             } else {
                 return new Type(0);
             }
-            
+
         }
     };
 }
 
 function is_greater_than() {
     return {
-        
+
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -170,7 +170,7 @@ function is_greater_than() {
 
 function is_less_than() {
     return {
-        
+
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -187,7 +187,7 @@ function is_less_than() {
 
 function is_greater_than_or_equal() {
     return {
-        
+
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -205,7 +205,7 @@ function is_greater_than_or_equal() {
 
 function is_less_than_or_equal() {
     return {
-        
+
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -222,7 +222,7 @@ function is_less_than_or_equal() {
 
 function is_equal() {
     return {
-        
+
         fn : (list, env) => {
 
             let left = list.shift();
@@ -262,7 +262,7 @@ function is_equal() {
             } else if (left.form === 'list'
                        && left.form === right.form
                        && left.value.length === right.value.length) {
-                
+
                 let head_equality = is_equal().fn([left.value.shift(), right.value.shift()], env);
                 if (head_equality.value === 'false') {
                     return head_equality;
@@ -278,7 +278,7 @@ function is_equal() {
 
 function pr_str() {
     return {
-        
+
         fn : (list, env) => {
             let out = '';
             for (let item of list) {
@@ -299,12 +299,12 @@ function pr_str() {
 
 function str() {
     return {
-        
+
         fn : (list, env) => {
             if (list.length === 0) {
                 return new Type('""');
             } else {
-                
+
                 let out = '';
                 for (let item of list) {
                     item = new Eval(item, env).eval_ast();
