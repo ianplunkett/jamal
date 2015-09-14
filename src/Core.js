@@ -7,112 +7,60 @@ import Reader    from './Reader.js';
 import Tokenizer from './Tokenizer.js';
 import Type      from './Type.js';
 
+function arithmetic (ast, env, fn) {
+    while(ast.next_sibling) {
+        if (ast.next_sibling.data.form === 'list') {
+            return [ast.next_sibling, env];
+        } else if (ast.data.form === 'list') {
+            return [ast, env];
+        }
+        ast.data.value = fn(ast.data.value, ast.next_sibling.data.value);
+        ast.removeNextSibling();
+    }
+    ast.parent.data = ast.data;
+    let parent = ast.parent;
+    parent.removeLastChild();
+    parent.removeLastChild();
+    parent.removeFirstChild();
+    if (parent.parent !== null) {
+        return [parent.parent, env];
+    } else {
+        return [parent, env];
+    }
+}
 
-// TODO, refactor arithmetic functions. Very similar functionality, can be pulled out
 function addition() {
+    const operation = (a, b) => a + b;
     return {
-        name : '+',
-        fn : (ast, env) => {
-            while(ast.next_sibling) {
-                if (ast.next_sibling.data.form === 'list') {
-                    return [ast.next_sibling, env];
-                } else if (ast.data.form === 'list') {
-                    return [ast, env];
-                }
-                ast.data.value += ast.next_sibling.data.value;
-                ast.removeNextSibling();
-            }
-            ast.parent.data = ast.data;
-            let parent = ast.parent;
-            parent.removeLastChild();
-            parent.removeLastChild();
-            parent.removeFirstChild();
-            if (parent.parent !== null) {
-                return [parent.parent, env];
-            } else {
-                return [parent, env];
-            }
+        fn: (ast, env) => {
+            return arithmetic(ast, env, operation );
         }
     };
 }
 
 function subtraction() {
+    const operation = (a, b) => a - b;
     return {
-        name : '-',
-        fn : (ast, env) => {
-            while(ast.next_sibling) {
-                if (ast.next_sibling.data.form === 'list') {
-                    return [ast.next_sibling, env];
-                } else if (ast.data.form === 'list') {
-                    return [ast, env];
-                }
-                ast.data.value -= ast.next_sibling.data.value;
-                ast.removeNextSibling();
-            }
-            ast.parent.data = ast.data;
-            let parent = ast.parent;
-            parent.removeLastChild();
-            parent.removeLastChild();
-            parent.removeFirstChild();
-            if (parent.parent !== null) {
-                return [parent.parent, env];
-            } else {
-                return [parent, env];
-            }
+        fn: (ast, env) => {
+            return arithmetic(ast, env, operation );
         }
     };
 }
 
 function multiplication() {
+    const operation = (a, b) => a * b;
     return {
-        name : '*',
-        fn : (ast, env) => {
-            while(ast.next_sibling) {
-                if (ast.next_sibling.data.form === 'list') {
-                    return [ast.next_sibling, env];
-                } else if (ast.data.form === 'list') {
-                    return [ast, env];
-                }
-                ast.data.value *= ast.next_sibling.data.value;
-                ast.removeNextSibling();
-            }
-            ast.parent.data = ast.data;
-            let parent = ast.parent;
-            parent.removeLastChild();
-            parent.removeLastChild();
-            parent.removeFirstChild();
-            if (parent.parent !== null) {
-                return [parent.parent, env];
-            } else {
-                return [parent, env];
-            }
+        fn: (ast, env) => {
+            return arithmetic(ast, env, operation );
         }
     };
 }
 
 function division() {
+    const operation = (a, b) => a / b;
     return {
-        name : '/',
-        fn : (ast, env) => {
-            while(ast.next_sibling) {
-                if (ast.next_sibling.data.form === 'list') {
-                    return [ast.next_sibling, env];
-                } else if (ast.data.form === 'list') {
-                    return [ast, env];
-                }
-                ast.data.value /= ast.next_sibling.data.value;
-                ast.removeNextSibling();
-            }
-            ast.parent.data = ast.data;
-            let parent = ast.parent;
-            parent.removeLastChild();
-            parent.removeLastChild();
-            parent.removeFirstChild();
-            if (parent.parent !== null) {
-                return [parent.parent, env];
-            } else {
-                return [parent, env];
-            }
+        fn: (ast, env) => {
+            return arithmetic(ast, env, operation );
         }
     };
 }
@@ -120,7 +68,7 @@ function division() {
 
 function list() {
     return {
-        name : 'list',
+        
         fn : (ast, env) => {
             while(ast.next_sibling) {
                 if (ast.next_sibling.data.form === 'list') {
@@ -158,7 +106,7 @@ function list() {
 
 function is_list() {
     return {
-        name : 'list',
+        
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -173,7 +121,7 @@ function is_list() {
 
 function is_empty() {
     return {
-        name : 'empty?',
+        
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -189,7 +137,7 @@ function is_empty() {
 
 function count() {
     return {
-        name : 'count',
+        
         fn : (list, env) => {
             let head = list.shift();
             let evaled_head = new Eval(head, env).eval_ast();
@@ -205,7 +153,7 @@ function count() {
 
 function is_greater_than() {
     return {
-        name : '>',
+        
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -222,7 +170,7 @@ function is_greater_than() {
 
 function is_less_than() {
     return {
-        name : '<',
+        
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -239,7 +187,7 @@ function is_less_than() {
 
 function is_greater_than_or_equal() {
     return {
-        name : '>=',
+        
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -257,7 +205,7 @@ function is_greater_than_or_equal() {
 
 function is_less_than_or_equal() {
     return {
-        name : '<=',
+        
         fn : (list, env) => {
             let left = new Eval(list.shift(), env).eval_ast();
             let right = new Eval(list.shift(), env).eval_ast();
@@ -274,7 +222,7 @@ function is_less_than_or_equal() {
 
 function is_equal() {
     return {
-        name : '=',
+        
         fn : (list, env) => {
 
             let left = list.shift();
@@ -330,7 +278,7 @@ function is_equal() {
 
 function pr_str() {
     return {
-        name : 'pr-str',
+        
         fn : (list, env) => {
             let out = '';
             for (let item of list) {
@@ -351,7 +299,7 @@ function pr_str() {
 
 function str() {
     return {
-        name : 'str',
+        
         fn : (list, env) => {
             if (list.length === 0) {
                 return new Type('""');
@@ -372,7 +320,6 @@ function str() {
 
 function prn() {
     return {
-        name : 'prn',
         fn : (list, env) => {
             let out = '';
             for (let item of list) {
@@ -392,7 +339,6 @@ function prn() {
 
 function println() {
     return {
-        name : 'println',
         fn : (list, env) => {
             let out = '';
             for (let item of list) {
